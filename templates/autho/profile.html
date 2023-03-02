@@ -1,0 +1,124 @@
+{% extends '../base.html' %}
+
+{% block content %}
+<main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+        <div class="container">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Portfolio Details</h2>
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li>Portfolio Details</li>
+                </ol>
+            </div>
+
+        </div>
+    </div><!-- End Breadcrumbs -->
+
+    <!-- ======= Portfolio Details Section ======= -->
+    <section id="portfolio-details" class="portfolio-details">
+        <div class="container" data-aos="fade-up">
+
+            <div class="row gy-4">
+
+                <div class="col-lg-8">
+                    <div class="portfolio-details-slider swiper">
+                        {% if request.user.account.freelancer_key %}
+                            <h3>all posts</h3>
+                            {% for post in posts %}
+                            <div class="card mb-3">
+                                <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="{{ post.image.url }}" class="img-fluid rounded-start" alt="...">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <a href="{% url 'post_detail' post.pk %}">
+                                            <div class="d-flex" style="justify-content: space-between">
+                                                <h5 class="card-title">{{ post.title }}</h5>
+                                                <p><span class="badge bg-warning text-dark">{{ post.category }}</span></p>
+                                            </div>
+
+                                            <p class="card-text">{{ post.content|slice:'200' }}</p>
+                                            <div class="d-flex" style="justify-content: space-between">
+                                                <p class="card-text"><small class="text-muted">{{ post.created_at }}</small></p>
+                                                <p class="card-text" style="color: green;"><small>${{ post.price }}</small></p>  
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <h4>what to work as a freelance for ensocio?</h4>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="portfolio-info">
+                        <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+                        {% if request.user.account.freelancer_key %}
+                            <small style="padding-right: 12px;">key: {{ user.account.freelancer_key }}</small>
+                        {% else %}
+                        {% endif %}
+                        <small>@{{ user.username }}</small>
+
+                        <img class="img-thumbnail" src="{{ user.profile.user_image.url }}" alt="profile img">
+                    </div>
+                    {% if request.user.account.freelancer_key %}
+                    <a href="{% url 'create_post' %}" >
+                        <button type="button" class="btn btn-primary form-control">
+                            create post
+                        </button>
+                    </a>
+                    {% else %}
+                    {% endif %}
+                    
+                    <div class="portfolio-description">
+                        <h2>Yo Soy</h2>
+                        <p>
+                            {{ user.profile.bio }}
+                        </p>
+                    </div>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary form-control" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                        Update
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </section><!-- End Portfolio Details Section -->
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ u_form.as_p }}
+                {{ p_form.as_p }}
+                <img src="{{ user.profile.user_image.url }}" alt="" srcset="">
+                <hr>
+                <input type="submit" class="btn btn-primary form-control" value="Update">
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main><!-- End #main -->
+
+{% endblock %}

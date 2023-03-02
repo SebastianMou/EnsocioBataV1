@@ -1,0 +1,27 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block content %}
+<section id="" class="container-fluid d-flex align-items-center justify-content-between">
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form.media }}
+                    {{ form.as_p }}
+                    <input value="Post" type="Submit" class="btn btn-primary">
+                </form>
+            </div>
+            <div class="col-4">
+                <br>
+                <div class="card">
+                    <div class="card-body">
+                        <img src="" alt="" srcset="">
+                        <h1>{{ user }}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
