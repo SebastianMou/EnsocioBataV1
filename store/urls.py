@@ -12,4 +12,7 @@ urlpatterns = [
     path('all_posts/', views.all_posts, name='all_posts'),
     path('post_detail/<int:pk>/', views.post_detail, name='post_detail'),
     path('edit_post/<int:pk>/', views.edit_post, name='edit_post'),
+    path('delete/<int:post_id>/', views.delete, name='delete'),
+    path('search/', views.search, name='search'),
+    path('category_list/<int:pk>', views.category_list, name='category_list'),
 ]

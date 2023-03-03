@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
+from django.db.models import Q
 
 from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, 
                     UserUpdateForm, ProfileUpdateForm, UpdatePostForm)
@@ -11,7 +12,25 @@ from .models import Post, Category, Profile
 
 # Create your views here.
 def home(request):
-    return render(request, 'home.html')
+    categories = Category.objects.filter(
+        Q(name__startswith='Vídeo y animación') | Q(name__startswith='Diseño gráfico') |
+        Q(name__startswith='Publicidad digital')
+    )[:3]
+    context = {
+        'categories': categories,
+    }
+    return render(request, 'home.html', context)
+
+def category_list(request, pk):
+    categories = Category.objects.all()
+    category = get_object_or_404(Category, pk=pk)
+    posts = Post.objects.filter(category=category)
+    context = {
+        'categories': categories,
+        'category': category,
+        'posts': posts,
+    }
+    return render(request, 'service/category.html', context)
 
 def user_login(request):
     if request.method == 'POST':
@@ -59,7 +78,7 @@ def buyer_register(request):
 @login_required
 def create_post(request):
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             if hasattr(request.user, 'account') and request.user.account.freelancer_key:
@@ -91,6 +110,12 @@ def edit_post(request, pk):
     }
     return render(request, 'service/edit_post.html', context)
 
+@login_required
+def delete(request, post_id=None):
+    post = Post.objects.get(id=post_id)
+    post.delete()
+    return redirect('/')
+
 def all_posts(request):
     posts = Post.objects.all()
     context = {
@@ -104,6 +129,17 @@ def post_detail(request, pk):
         'post': post,
     }
     return render(request, 'service/post_detail.html', context)
+
+def search(request):
+    if request.method == 'POST':
+        query = request.POST.get('search')
+        results = Post.objects.filter(title__icontains=query)
+        context = {
+            'results': results,
+        }
+        return render(request, 'service/search.html', context)
+    else:
+        return render(request, 'service/search.html') 
 
 @login_required
 def profile(request):

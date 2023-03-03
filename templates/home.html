@@ -11,6 +11,26 @@
           <h1 data-aos="fade-up">Conectando empresas con el mejor talento en línea</h1>
           <h2 data-aos="fade-up" data-aos-delay="400">Te brindamos las herramientas y el conocimiento para alcanzar tus objetivos y hacer crecer tu empresa</h2>
           <div data-aos="fade-up" data-aos-delay="600">
+
+            <div class="d-flex">
+              {% for category in categories %}
+                <div style="padding-bottom: 5px; padding-left: 4px;">
+                  <a href="{% url 'category_list' category.pk %}">
+                    <span class="badge rounded-pill bg-primary">{{ category.name }}</span>
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+
+            <form action="{% url 'search' %}" method="POST" class="d-flex">
+              {% csrf_token %}
+              <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                  height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg></button>
+            </form>
+
             <div class="text-center text-lg-start">
               <a href="{% url 'all_posts' %}" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
                 <span>Empezar</span>

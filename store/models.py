@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
 from django.core.validators import FileExtensionValidator
+from PIL import Image
 
 # Create your models here.
 class Account(models.Model):
@@ -21,6 +22,16 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return f'profile of -> {self.user.username}'
+    
+    def save(self, force_insert=False, force_update=False, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        img = Image.open(self.user_image.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.user_image.path)
 
 class Category(models.Model):
     name = models.CharField(max_length=200, db_index=True)

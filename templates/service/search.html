@@ -1,0 +1,28 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block content %}
+<br><br>
+<section class="container-fluid d-flex align-items-center justify-content-between">
+    <div class="container">
+        <h5>search</h5>
+        <div class="row">
+        {% for post in results %}
+            <div class="col">
+                <div class="card" style="width: 20rem;">
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <a href="{% url 'post_detail' post.pk %}">
+                            <div  class="d-flex" style="justify-content: space-between">
+                                <h5 class="card-title">{{ post.title }}</h5>
+                                <b>${{ post.price }}</b>
+                            </div>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}  
+        </div>
+    </div>
+</section>
+{% endblock %}
