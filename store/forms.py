@@ -89,6 +89,23 @@ class PostForm(forms.ModelForm):
         'class': 'form-control',
     }))
     detailed_description = RichTextField()
+    image = forms.ImageField(widget=ClearableFileInput(attrs={
+        'class': 'form-control',
+    }), required=False)
+    image2 = forms.ImageField(widget=ClearableFileInput(attrs={
+        'class': 'form-control',
+    }), required=False)
+    image3 = forms.ImageField(widget=ClearableFileInput(attrs={
+        'class': 'form-control',
+    }), required=False)
+    price = forms.DecimalField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Enter price here (e.g. 10.99)',
+    }))
+    is_active = forms.BooleanField(widget=forms.CheckboxInput(attrs={
+        'class': 'form-check-input',
+    }), required=True)
+
     class Meta:
         model = Post
         fields = ['category', 'title', 'content', 'detailed_description', 'image', 'image2', 'image3', 'price', 'is_active']

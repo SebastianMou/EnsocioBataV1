@@ -35,6 +35,7 @@ class Profile(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=200, db_index=True)
+    category_image = models.ImageField(upload_to='cIcons/', null=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 

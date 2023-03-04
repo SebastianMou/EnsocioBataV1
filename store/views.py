@@ -22,15 +22,30 @@ def home(request):
     return render(request, 'home.html', context)
 
 def category_list(request, pk):
-    categories = Category.objects.all()
-    category = get_object_or_404(Category, pk=pk)
-    posts = Post.objects.filter(category=category)
-    context = {
-        'categories': categories,
-        'category': category,
-        'posts': posts,
-    }
-    return render(request, 'service/category.html', context)
+    if request.method == 'POST':
+        query = request.POST.get('search')
+        results = Post.objects.filter(title__icontains=query)
+
+        categories = Category.objects.all()
+        category = get_object_or_404(Category, pk=pk)
+        posts = Post.objects.filter(category=category)
+        context = {
+            'categories': categories,
+            'category': category,
+            'posts': posts,
+            'results': results,
+        }
+        return render(request, 'service/category.html', context)
+    else:
+        categories = Category.objects.all()
+        category = get_object_or_404(Category, pk=pk)
+        posts = Post.objects.filter(category=category)
+        context = {
+            'categories': categories,
+            'category': category,
+            'posts': posts,
+        }
+        return render(request, 'service/category.html', context)
 
 def user_login(request):
     if request.method == 'POST':
@@ -134,8 +149,11 @@ def search(request):
     if request.method == 'POST':
         query = request.POST.get('search')
         results = Post.objects.filter(title__icontains=query)
+        results_c = Category.objects.filter(name__icontains=query)
         context = {
             'results': results,
+            'query': query,
+            'results_c': results_c,
         }
         return render(request, 'service/search.html', context)
     else:
