@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.urls import reverse
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -20,6 +21,25 @@ from .models import Post, Category, Profile
 
 # Create your views here.
 def home(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        subject = request.POST.get('subject')
+        name = request.POST.get('name')
+        data = {
+            'complaint': 'ENSOCIO.MX',
+            'name': name,
+            'subject': subject,
+            'email': email,
+            'message': message, 
+        }
+        message = '''
+        From: {}
+        Email: {}
+        New message: {}
+        '''.format(data['name'], data['email'], data['message'])
+        send_mail(data['complaint'], message, '', ['ensocio.mx@gmail.com'])
+
     categories = Category.objects.filter(
         Q(name__startswith='Vídeo y animación') | Q(name__startswith='Diseño gráfico') |
         Q(name__startswith='Publicidad digital')
@@ -283,4 +303,3 @@ def profile(request):
         'posts': posts,
     }
     return render(request, 'autho/profile.html', context)
-
