@@ -1,0 +1,15 @@
+{% extends '../base.html' %}
+{% load static %}
+{% block content %}
+<section id="hero" class="hero d-flex align-items-center">
+
+    <div class="container">
+        <h1>Delete Account</h1>
+        <p>Are you sure you want to delete your account?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, delete my account</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

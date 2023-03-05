@@ -6,6 +6,13 @@
   <section id="hero" class="hero d-flex align-items-center">
 
     <div class="container">
+      {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <div class="alert alert-primary" role="alert">{{ message }}</div>
+                {% endfor %}
+            </ul>
+      {% endif %}
       <div class="row">
         <div class="col-lg-6 d-flex flex-column justify-content-center">
           <h1 data-aos="fade-up">Conectando empresas con el mejor talento en línea</h1>

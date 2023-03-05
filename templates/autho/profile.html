@@ -1,5 +1,5 @@
 {% extends '../base.html' %}
-
+{% load static %}
 {% block content %}
 <main id="main">
 
@@ -8,10 +8,10 @@
         <div class="container">
 
             <div class="d-flex justify-content-between align-items-center">
-                <h2>Portfolio Details</h2>
+                <h2>Perfil</h2>
                 <ol>
-                    <li><a href="/">Home</a></li>
-                    <li>Portfolio Details</li>
+                    <li><a href="/">Inicio</a></li>
+                    <li>Perfil</li>
                 </ol>
             </div>
 
@@ -67,7 +67,7 @@
                         {% else %}
                         {% endif %}
                         <small>@{{ user.username }}</small>
-
+                        <h6>-</h6>
                         <img class="img-thumbnail" src="{{ user.profile.user_image.url }}" alt="profile img">
                     </div>
                     {% if request.user.account.freelancer_key %}
@@ -89,6 +89,13 @@
                     <button type="button" class="btn btn-primary form-control" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                         Update
                     </button>
+                    <hr>
+                    <a href="{% url 'delete_account' %}">
+                        <button type="button" class="btn btn-danger form-control" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            Delete
+                        </button>
+                    </a>
+                   
                 </div>
 
             </div>
@@ -108,7 +115,11 @@
                 {% csrf_token %}
                 {{ u_form.as_p }}
                 {{ p_form.as_p }}
-                <img src="{{ user.profile.user_image.url }}" alt="" srcset="">
+                <a href="{% url 'password_change' %}">change password</a>
+                <hr>
+                <center>
+                    <img style="width: 56%; height: auto;" src="{{ user.profile.user_image.url }}" alt="" srcset="">
+                </center>
                 <hr>
                 <input type="submit" class="btn btn-primary form-control" value="Update">
             </form>

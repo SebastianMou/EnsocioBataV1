@@ -1,9 +1,57 @@
 {% extends '../base.html' %}
 {% load static %}
 {% block content %}
+<style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:weight@100;200;300;400;500;600;700;800&display=swap");
+    .search {
+        position: relative;
+        box-shadow: 0 0 40px rgba(51, 51, 51, .1);
+    }
+    .search input {
+        height: 50px;
+        text-indent: 25px;
+        border: 2px solid #d6d4d4;
+        border-radius: 17px;
+    }
+    .search input:focus {
+        box-shadow: none;
+        border: 2px solid rgb(35, 35, 245);
+        border-radius: 17px;
+    }
+    .search .fa-search {
+        position: absolute;
+        top: 20px;
+        left: 16px;
+    }
+    .search button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        height: 40px;
+        width: 80px;
+        background: rgb(60, 60, 242);
+        border-radius: 17px;
+    }
+</style>
 <br><br>
 <section class="container-fluid d-flex align-items-center justify-content-between">
     <div class="container">
+        <center>
+            <h1>Encuentra Tu Servicio</h1>
+        </center>
+        <div style="padding: 14px;" class="container">
+            <div class="row height d-flex justify-content-center align-items-center">
+                <div class="col-md-8">
+                    <div class="search">
+                        <form action="{% url 'search' %}" method="post">
+                            {% csrf_token %}
+                            <input name="search" type="text" class="form-control" placeholder="Busca un Servicio">
+                            <button value="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>    
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="row">
         {% for post in posts %}
             <div class="col">
