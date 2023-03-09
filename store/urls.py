@@ -18,6 +18,11 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('category_list/<int:pk>', views.category_list, name='category_list'),
 
+    # add this line to map the URL for create_checkout_session view
+    path('create_checkout_session/<int:pk>/', views.create_checkout_session, name='create_checkout_session'),
+    path('checkout_success/', views.checkout_success, name='checkout_success'),
+    path('checkout_cancel/', views.checkout_cancel, name='checkout_cancel'),
+
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
 
     path('change_password/', auth_views.PasswordChangeView.as_view(template_name='authentication/password_change.html', success_url='/password_changed/'), name='password_change'),

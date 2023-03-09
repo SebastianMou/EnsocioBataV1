@@ -15,9 +15,15 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
 from .tokens import account_activation_token
 
+import stripe
+from django.conf import settings
+from django.http import JsonResponse
+
 from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, 
                     UserUpdateForm, ProfileUpdateForm, UpdatePostForm)
 from .models import Post, Category, Profile
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create your views here.
 def home(request):
@@ -249,6 +255,8 @@ def edit_post(request, pk):
 @login_required
 def delete(request, post_id=None):
     post = Post.objects.get(id=post_id)
+    if post.author != request.user:
+        return redirect('/')
     post.delete()
     return redirect('/')
 
@@ -263,8 +271,42 @@ def post_detail(request, pk):
     post = get_object_or_404(Post, id=pk)
     context = {
         'post': post,
+        'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
     }
     return render(request, 'service/post_detail.html', context)
+
+def create_checkout_session(request, pk):
+    product = get_object_or_404(Post, pk=pk)
+    ng = "http://127.0.0.1:8000/"
+    if request.method == 'POST':
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'mxn',
+                        'unit_amount': product.price,
+                        'product_data': {
+                            'name': product.title,
+                        },
+                    },
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url=ng + '/checkout_success',
+            cancel_url=ng + '/checkout_cancel',
+        )
+        return redirect(checkout_session.url)
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+
+def checkout_success(request):
+    return render(request, 'checkout_success.html')
+
+def checkout_cancel(request):
+    return render(request, 'checkout_cancel.html')
 
 def search(request):
     if request.method == 'POST':

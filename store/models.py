@@ -54,7 +54,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to='images/', default='images/default.png', null=True)
     image2 = models.ImageField(upload_to='images/', default='images/default.png', null=True)
     image3 = models.ImageField(upload_to='images/', default='images/default.png', null=True)
-    price = models.DecimalField(max_digits=7, decimal_places=2, null=True)
+    price = models.IntegerField(default=0, null=True)
     is_active = models.BooleanField(default=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True, null=True)
@@ -65,3 +65,6 @@ class Post(models.Model):
 
     def __str__(self) -> str:
         return self.title
+    
+    def get_display_price(self):
+        return "{0:.2f}".format(self.price / 100)
