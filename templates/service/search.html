@@ -3,26 +3,31 @@
 {% block content %}
 <style>
     @import url("https://fonts.googleapis.com/css2?family=Poppins:weight@100;200;300;400;500;600;700;800&display=swap");
+
     .search {
         position: relative;
         box-shadow: 0 0 40px rgba(51, 51, 51, .1);
     }
+
     .search input {
         height: 50px;
         text-indent: 25px;
         border: 2px solid #d6d4d4;
         border-radius: 17px;
     }
+
     .search input:focus {
         box-shadow: none;
         border: 2px solid rgb(35, 35, 245);
         border-radius: 17px;
     }
+
     .search .fa-search {
         position: absolute;
         top: 20px;
         left: 16px;
     }
+
     .search button {
         position: absolute;
         top: 5px;
@@ -42,64 +47,82 @@
                     <div class="search">
                         <form action="{% url 'search' %}" method="post">
                             {% csrf_token %}
-                            <input name="search" type="text" class="form-control" value="{{ query }}" placeholder="Busca un Servicio">
-                            <button value="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>    
+                            <input name="search" type="text" class="form-control" value="{{ query }}"
+                                placeholder="Busca un Servicio">
+                            <button value="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
         <nav class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Servicios</a>
-            <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">categories</a>
-          </nav>
-          <div class="tab-content" id="nav-tabContent">
+            <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab"
+                aria-controls="nav-home" aria-selected="true">Servicios</a>
+            <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab"
+                aria-controls="nav-profile" aria-selected="false">categories</a>
+        </nav>
+        {% if results %}
+        <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                 <br>
-
-                <div class="row">
-                    {% for post in results %}
-                    <div class="col">
-                        <div class="card" style="width: 20rem;">
-                            <img src="{{ post.image.url }}" class="card-img-top" alt="...">
-                            <div class="card-body">
-                                <a href="{% url 'post_detail' post.pk %}">
-                                    <div  class="d-flex" style="justify-content: space-between">
-                                        <h5 class="card-title">{{ post.title }}</h5>
-                                        <b>${{ post.price }}</b>
-                                    </div>
-                                    <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
-                                </a>
+                <center>
+                    <div class="row">
+                        {% for post in results %}
+                        <div class="col">
+                            <div class="card" style="width: 20rem;">
+                                <img src="{{ post.image.url }}" class="card-img-top" alt="...">
+                                <div class="card-body">
+                                    <a href="{% url 'post_detail' post.pk %}">
+                                        <div class="d-flex" style="justify-content: space-between">
+                                            <h5 class="card-title">{{ post.title }}</h5>
+                                            <b>${{ post.get_display_price }}</b>
+                                        </div>
+                                        <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
+                                    </a>
+                                </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}  
-                </div>
+                </center>
             </div>
             <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <br>
-                <div class="row">
-                    {% for c in results_c %}
-                    <div class="col">
-                        <div style="width: 70%;" class="card">
-                            <div class="card-body">
-                                <a href="{% url 'category_list' c.pk %}">
-                                    <center>
-                                        {% if c.category_image %}
-                                            <img style="width: 90px; height: auto;" src="{{ c.category_image.url }}" alt="">
-                                        {% endif %}
-                                        <hr>
-                                        <small>{{ c.name }}</small>
-                                    </center>
-                                </a>
+                <center>
+                    <div class="row">
+                        {% for c in results_c %}
+                        <div class="col">
+                            <div style="width: 70%;" class="card">
+                                <div class="card-body">
+                                    <a href="{% url 'category_list' c.pk %}">
+                                        <center>
+                                            {% if c.category_image %}
+                                            <img style="width: 90px; height: auto;" src="{{ c.category_image.url }}"
+                                                alt="">
+                                            {% endif %}
+                                            <hr>
+                                            <small>{{ c.name }}</small>
+                                        </center>
+                                    </a>
+                                </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
-                </div>
+                </center>
             </div>
-            <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium minima repellat incidunt facilis obcaecati blanditiis corrupti ad officia doloribus ullam sapiente ipsum, nemo a, excepturi voluptatem voluptatibus velit eum dignissimos ut, nam tempora? Reiciendis illo itaque veritatis eligendi fuga, mollitia ratione totam veniam esse in.</div>
-          </div>
+            <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab">Lorem ipsum
+                dolor sit amet consectetur, adipisicing elit. Laudantium minima repellat incidunt facilis obcaecati
+                blanditiis corrupti ad officia doloribus ullam sapiente ipsum, nemo a, excepturi voluptatem voluptatibus
+                velit eum dignissimos ut, nam tempora? Reiciendis illo itaque veritatis eligendi fuga, mollitia ratione
+                totam veniam esse in.</div>
+        </div>
+        {% else %}
+        <center>
+            <img style="width: 50%; height: auto;" src="{%  static '/assets/img/Search_not_fount.png' %}" alt="asd" srcset="">
+            <h6>La búsqueda para <b>'<u>{{ query }}</u>'</b> no fue encontrada</h6>
+        </center>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

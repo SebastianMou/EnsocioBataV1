@@ -52,24 +52,60 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-        {% for post in posts %}
-            <div class="col">
-                <div class="card" style="width: 20rem;">
-                    <img src="{{ post.image.url }}" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <a href="{% url 'post_detail' post.pk %}">
-                            <div  class="d-flex" style="justify-content: space-between">
-                                <h5 class="card-title">{{ post.title }}</h5>
-                                <b>${{ post.price }}</b>
+        <nav class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Servicios</a>
+            <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">categories</a>
+        </nav>
+          <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                <br>
+                <center>
+                <div class="row">
+                    {% for post in posts %}
+                        <div class="col">
+                            <div class="card" style="width: 20rem;">
+                                <center>
+                                    <img style="width: 50%; height: auto;" src="{{ post.image.url }}" class="card-img-top" alt="...">
+                                </center>
+                                <div class="card-body">
+                                    <a href="{% url 'post_detail' post.pk %}">
+                                        <div  class="d-flex" style="justify-content: space-between">
+                                            <h5 class="card-title">{{ post.title }}</h5>
+                                            <b>${{ post.get_display_price }}</b>
+                                        </div>
+                                        <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
+                                    </a>
+                                </div>
                             </div>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
-                        </a>
-                    </div>
+                        </div>
+                    {% endfor %}  
                 </div>
+                </center>
             </div>
-        {% endfor %}  
-        </div>
+            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <br>
+                <center>
+                <div class="row">
+                    {% for category in categories %}
+                    <div class="col">
+                        <div style="width: 70%;" class="card">
+                            <div class="card-body">
+                                <a href="{% url 'category_list' category.pk %}">
+                                    <center>
+                                        <img style="width: 90px; height: auto;" src="{{ category.category_image.url }}" alt="">
+                                        <hr>
+                                        <small>{{ category.name }}</small>
+                                    </center>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                </center>
+            </div>
+            <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium minima repellat incidunt facilis obcaecati blanditiis corrupti ad officia doloribus ullam sapiente ipsum, nemo a, excepturi voluptatem voluptatibus velit eum dignissimos ut, nam tempora? Reiciendis illo itaque veritatis eligendi fuga, mollitia ratione totam veniam esse in.</div>
+          </div>
     </div>
 </section>
 {% endblock %}

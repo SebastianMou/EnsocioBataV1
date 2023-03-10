@@ -56,7 +56,9 @@
             {% for post in posts %}
             <div class="col">
                 <div class="card" style="width: 20rem;">
-                    <img src="{{ post.image.url }}" class="card-img-top" alt="...">
+                    <center>
+                        <img style="width: 90px; height: auto;" src="{{ post.image.url }}" class="card-img-top" alt="...">
+                    </center>
                     <div class="card-body">
                         <a href="{% url 'post_detail' post.pk %}">
                             <div class="d-flex" style="justify-content: space-between">

@@ -104,6 +104,7 @@ class PostForm(forms.ModelForm):
     }))
     is_active = forms.BooleanField(widget=forms.CheckboxInput(attrs={
         'class': 'form-check-input',
+        'style': 'width: 22px; height: 22px;',
     }), required=True)
 
     class Meta:

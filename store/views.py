@@ -88,7 +88,7 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('/')
+            return redirect('profile')
     else:
         pass
     return render(request, 'autho/user_login.html')
@@ -174,7 +174,7 @@ def activate_buyer(request, uidb64, token):
         user.save()
 
         messages.success(request, 'Thank you for your email confirmation. Now you can login your account.')
-        return redirect('/')
+        return redirect('user_login')
     else:
         messages.error(request, 'Activation link is invalid!')
     return render(request, 'home.html')
@@ -226,7 +226,7 @@ def create_post(request):
             if hasattr(request.user, 'account') and request.user.account.freelancer_key:
                 post.author = request.user
                 post.save()
-                return redirect('/')
+                return redirect('post_detail', pk=post.pk)
             else:
                 form.add_error(None, 'You must have a freelancer key number to create a post.')
     else:
@@ -262,8 +262,10 @@ def delete(request, post_id=None):
 
 def all_posts(request):
     posts = Post.objects.all()
+    categories = Category.objects.all()
     context = {
         'posts': posts,
+        'categories': categories,
     }
     return render(request, 'service/all_posts.html', context)
 
@@ -325,6 +327,7 @@ def search(request):
 @login_required
 def profile(request):
     posts = Post.objects.filter(author=request.user)
+    post_count = Post.objects.count()
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         profile, created = Profile.objects.get_or_create(user=request.user)  # If the switch is True, that means Django had to create a new Profile object for the user because it couldn't find an existing one
@@ -343,5 +346,6 @@ def profile(request):
         'u_form': u_form,
         'p_form': p_form,
         'posts': posts,
+        'post_count': post_count,
     }
     return render(request, 'autho/profile.html', context)
