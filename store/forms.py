@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
 from django.forms.widgets import ClearableFileInput
 
-from .models import Account, Category, Post, Profile
+from .models import Account, Category, Post, Profile, Review
 
 class UserSellerRegisterForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={
@@ -195,3 +195,22 @@ class UpdatePostForm(forms.ModelForm):
             'category', 'title', 'content', 'detailed_description', 
             'image', 'image2', 'image3', 'price', 'is_active',
         ]
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['text', 'rating']
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Enter your review here...',
+                'rows': 4,
+                'cols': 50
+            }),
+            'rating': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': 1, 
+                'max': 5, 
+                'step': 1
+            }),
+        }
