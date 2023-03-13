@@ -2,19 +2,37 @@
 {% load static %}
 
 {% block content %}
-
+<style>
+  #reply-input {
+    border-radius: 1px;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  .collapsible {
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+  }
+  .content {
+    padding: 0 8%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+  }
+</style>
 <main id="main">
-
   <!-- ======= Breadcrumbs ======= -->
   <section class="breadcrumbs">
     <div class="container">
-
       <ol>
         <li><a href="/">Home</a></li>
         <li><a href="{% url 'all_posts' %}">Blog</a></li>
         <li>Blog Single</li>
       </ol>
-      <h2>{{ post.title }}</h2>
+      <h2>{{ product.title }}</h2>
 
     </div>
   </section><!-- End Breadcrumbs -->
@@ -34,15 +52,15 @@
                 <div class="swiper-wrapper align-items-center">
 
                   <div class="swiper-slide">
-                    <img style="width: 98%; height: auto;" src="{{ post.image.url }}" alt="">
+                    <img style="width: 98%; height: auto;" src="{{ product.image.url }}" alt="">
                   </div>
 
                   <div class="swiper-slide">
-                    <img style="width: 98%; height: auto;" src="{{ post.image2.url }}" alt="">
+                    <img style="width: 98%; height: auto;" src="{{ product.image2.url }}" alt="">
                   </div>
 
                   <div class="swiper-slide">
-                    <img style="width: 98%; height: auto;" src="{{ post.image3.url }}" alt="">
+                    <img style="width: 98%; height: auto;" src="{{ product.image3.url }}" alt="">
                   </div>
 
 
@@ -52,23 +70,23 @@
             </div>
 
             <h2 class="entry-title">
-              <a href="">{{ post.title }}</a>
+              <a href="">{{ product.title }}</a>
             </h2>
 
             <div class="entry-meta">
               <ul>
-                <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a href="">{{ post.author }}</a></li>
+                <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a href="">{{ product.author }}</a></li>
                 <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a href=""><time
-                      datetime="2020-01-01">{{ post.created_at }}</time></a></li>
+                      datetime="2020-01-01">{{ product.created_at }}</time></a></li>
                 <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a href="">{{ cout_reviews }} Comentarios</a></li>
                 <li class="d-flex align-items-center"><i class=""></i>
                   <h4>|</h1>
                   </h4>
-                  {% if request.user == post.author %}
+                  {% if request.user == product.author %}
                     <li style="justify-content: space-between" class="d-flex align-items-center"><i class="bi bi-pen"></i>
-                      <a href="{% url 'edit_post' post.id %}">Edit</a></li>
+                      <a href="{% url 'edit_post' product.id %}">Edit</a></li>
                     <li style="justify-content: space-between" class="d-flex align-items-center"><i class="bi bi-trash"></i>
-                      <a href="{% url 'delete' post.id %}">Delete</a></li>
+                      <a href="{% url 'delete' product.id %}">Delete</a></li>
                 {% endif %}
               </ul>
             </div>
@@ -78,24 +96,22 @@
                 <div>
                   <h5>Conclucion</h5>
                   <p style="color: rgb(106, 106, 106);">
-                    {{ post.content }}
+                    {{ product.content }}
                   </p>
                 </div>
               </div><!-- End blog author bio -->
-              <p>{{ post.detailed_description|safe }}</p>
+              <p>{{ product.detailed_description|safe }}</p>
 
             </div>
 
             <div class="entry-footer">
               <i class="bi bi-folder"></i>
               <ul class="cats">
-                <li><a href="{% url 'category_list' post.id %}">{{ post.category }}</a></li>
+                <li><a href="{% url 'category_list' product.id %}">{{ product.category }}</a></li>
               </ul>
             </div>
 
           </article><!-- End blog entry -->
-
-
 
           <div class="blog-comments">
             
@@ -104,22 +120,52 @@
               {% csrf_token %}
               {{ form.rating }}
               {{ form.text }}
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" style="float: right;">comentar</button>
             </form>
             <div id="comment-1" class="comment">
-              {% for review in reviews %}
-              <div class="d-flex">
-                <div class="comment-img"><img src="{{ review.user.profile.user_image.url }}" alt=""></div>
-                <div>
-                  <h5><a href="">{{ review.user }}</a> <a href="#" class="reply"><i class="bi bi-reply-[fill]"></i> Responder</a>
-                  </h5>
-                  <time datetime="2020-01-01">{{ review.created_at }}</time>
-                  <p>
-                    {{ review.text }}
-                  </p>
+              {% for comment in comments %}
+                <div class="d-flex">
+                  <div class="comment-img"><img src="{{ comment.author.profile.user_image.url }}" alt=""></div>
+                  <div>
+                    <h5><a href="">{{ comment.author }}</a>
+                    </h5>
+                    <time datetime="2020-01-01">{{ comment.created_at }}</time>
+                    <p>
+                      {{ comment.text }}
+                    </p>
+                  </div>
+                    <p>valoración: {{ comment.rating }}/5</p>
                 </div>
-                  <p>valoración: {{ review.rating }}/5</p>
-              </div>
+                <button style="margin-left: 8%; background-color: white; padding-bottom: 12px; color: gray;" class="collapsible"><i class="bi bi-caret-down-fill"></i>agregar comentario</button>
+                  <div class="content">
+                    <div class="reply-form-container" data-comment-id="{{ comment.id }}">
+                      <form action="{% url 'post_detail' product.pk %}" method="POST">
+                        {% csrf_token %}
+                        {{ reply_form.rating }}
+                        {{ reply_form.text }}
+                        <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                        <div style="padding: 12px;">
+                          <button class="btn btn-primary" type="submit" style="float: right;">Submit</button>
+                        </div>
+                      </form>
+                    </div>
+                    {% for reply in comment.replies.all %}
+                    <div style="padding-left: 6px;" class="d-flex">
+                      <div class="comment-img"><img src="{{ reply.author.profile.user_image.url }}" alt=""></div>
+                      <div>
+                        <h5><a href="">{{ reply.author }}</a>
+                        </h5>
+                        <time datetime="2020-01-01">{{ reply.created_at }}</time>
+                        <p>
+                          {{ reply.text }}
+                        </p>
+                      </div>
+                        <p>valoración: {{ reply.rating }}/5</p>
+                    </div>
+                    {% endfor %}
+                  </div>
+              {% empty %}
+                <p>No comments yet.</p>
               {% endfor %}
 
             </div><!-- End comment #1 -->
@@ -134,18 +180,18 @@
               <div class="portfolio-info">
                 <h3>Project information</h3>
                 <ul>
-                  <li><strong>Category</strong>: {{ post.category }}</li>
-                  <li><strong>Subido</strong>: {{ post.created_at }}</li>
-                  <li><strong>Actualisado</strong>: {{ post.updated }}</li>
-                  <li><strong>Precio</strong>: ${{ post.get_display_price }}</li>
+                  <li><strong>Categoría</strong>: {{ product.category }}</li>
+                  <li><strong>Subido</strong>: {{ product.created_at }}</li>
+                  <li><strong>Actualisado</strong>: {{ product.updated }}</li>
+                  <li><strong>Precio</strong>: ${{ product.get_display_price }}</li>
                 </ul>
               </div>
             </div><!-- End sidebar search formn-->
             <div class="card">
               <div class="card-body">
-                <center><h4 style="color: green;">${{ post.get_display_price }}</h4></center>
+                <center><h4 style="color: green;">${{ product.get_display_price }}</h4></center>
                   <!-- updated form action with product ID/pk as a URL parameter -->
-                  <form action="{% url 'create_checkout_session' post.pk %}" method="POST">
+                  <form action="{% url 'create_checkout_session' product.pk %}" method="POST">
                     {% csrf_token %}
                     <button class="btn btn-primary form-control" type="submit" id="checkout-button">Checkout</button>
                   </form>
@@ -160,4 +206,19 @@
     </div>
   </section><!-- End Blog Single Section -->
 </main><!-- End #main -->
+<script>
+  var coll = document.getElementsByClassName("collapsible");
+  var i;
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.maxHeight){
+        content.style.maxHeight = null;
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+      } 
+    });
+  }
+</script>
 {% endblock %}

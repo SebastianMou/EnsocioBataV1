@@ -20,8 +20,8 @@ from django.conf import settings
 from django.http import JsonResponse
 
 from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, 
-                    UserUpdateForm, ProfileUpdateForm, UpdatePostForm, ReviewForm)
-from .models import Post, Category, Profile, Review
+                    UserUpdateForm, ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm)
+from .models import Post, Category, Profile, Comment
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -270,25 +270,59 @@ def all_posts(request):
     }
     return render(request, 'service/all_posts.html', context)
 
-def post_detail(request, pk):
-    post = get_object_or_404(Post, id=pk)
-    reviews = Review.objects.filter(post=post)
-    cout_reviews = Review.objects.filter(post=post).count()
+# def post_detail(request, pk):
+#     post = get_object_or_404(Post, id=pk)
+#     reviews = Review.objects.filter(post=post)
+#     cout_reviews = Review.objects.filter(post=post).count()
 
+#     if request.method == 'POST':
+#         form = ReviewForm(request.POST)
+#         if form.is_valid():
+#             review = form.save(commit=False)
+#             review.user = request.user
+#             review.save()
+#             return redirect(reverse('post_detail', args=[post.pk]), context=context)
+#     else:
+#         form = ReviewForm()
+#     context = {
+#         'post': post,
+#         'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
+#         'reviews': reviews,
+#         'form': form,
+#         'cout_reviews': cout_reviews,
+#     }
+#     return render(request, 'service/post_detail.html', context)
+
+def post_detail(request, pk):
+    product = get_object_or_404(Post, pk=pk)
+    comments = product.comment_set.filter(parent__isnull=True)
+    cout_reviews = Comment.objects.filter(product=product).count()
     if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.user = request.user
-            review.save()
-            return redirect(reverse('post_detail', args=[post.pk]), context=context)
+        form = CommentForm(request.POST)
+        reply_form = ReplyForm(request.POST)
+        if 'comment_id' in request.POST:  # processing a reply
+            comment = get_object_or_404(Comment, pk=request.POST['comment_id'])
+            reply = reply_form.save(commit=False)
+            reply.product = product
+            reply.author = request.user
+            reply.parent = comment
+            reply.save()
+            return redirect('post_detail', pk=pk)  # redirect back to the same page after replying
+        elif form.is_valid():  # processing a new top-level comment
+            comment = form.save(commit=False)
+            comment.product = product
+            comment.author = request.user
+            comment.save()
+            return redirect('post_detail', pk=pk)  # redirect back to the same page after commenting
     else:
-        form = ReviewForm()
+        form = CommentForm()
+        reply_form = ReplyForm()
     context = {
-        'post': post,
+        'product': product,
         'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
-        'reviews': reviews,
+        'comments': comments,
         'form': form,
+        'reply_form': reply_form,
         'cout_reviews': cout_reviews,
     }
     return render(request, 'service/post_detail.html', context)

@@ -69,15 +69,16 @@ class Post(models.Model):
     def get_display_price(self):
         return "{0:.2f}".format(self.price / 100)
 
-class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+class Comment(models.Model):
+    product = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
 
     class Meta:
         ordering = ('-created_at',)
 
     def __str__(self) -> str:
-        return self.text
+        return str(self.parent) + ' -> ' + str(self.author) + ' -> ' + str(self.text)
