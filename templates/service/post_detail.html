@@ -63,7 +63,6 @@
                     <img style="width: 98%; height: auto;" src="{{ product.image3.url }}" alt="">
                   </div>
 
-
                 </div>
                 <div class="swiper-pagination"></div>
               </div>
@@ -75,7 +74,7 @@
 
             <div class="entry-meta">
               <ul>
-                <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a href="">{{ product.author }}</a></li>
+                <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a href="{% url 'visible_profile' product.author.username %}">{{ product.author }}</a></li>
                 <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a href=""><time
                       datetime="2020-01-01">{{ product.created_at }}</time></a></li>
                 <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a href="">{{ cout_reviews }} Comentarios</a></li>
@@ -87,7 +86,7 @@
                       <a href="{% url 'edit_post' product.id %}">Edit</a></li>
                     <li style="justify-content: space-between" class="d-flex align-items-center"><i class="bi bi-trash"></i>
                       <a href="{% url 'delete' product.id %}">Delete</a></li>
-                {% endif %}
+                  {% endif %}
               </ul>
             </div>
 
@@ -101,7 +100,6 @@
                 </div>
               </div><!-- End blog author bio -->
               <p>{{ product.detailed_description|safe }}</p>
-
             </div>
 
             <div class="entry-footer">
@@ -116,19 +114,26 @@
           <div class="blog-comments">
             
             <h4 class="comments-count">{{ cout_reviews }} Comentarios</h4>
-            <form method="POST">
-              {% csrf_token %}
-              {{ form.rating }}
-              {{ form.text }}
-              <button type="submit" class="btn btn-primary" style="float: right;">comentar</button>
-            </form>
+            {% if user.is_authenticated %}
+              <form method="POST">
+                {% csrf_token %}
+                {{ form.rating }}
+                {{ form.text }}
+                <button type="submit" class="btn btn-primary" style="float: right;">comentar</button>
+              </form>
+            {% else %}
+              <div class="alert alert-primary" role="alert">
+                Para comentar, tienes que <a href="{% url 'user_login' %}"><u>iniciar</u></a> sesión
+              </div>
+            {% endif %}
             <div id="comment-1" class="comment">
               {% for comment in comments %}
                 <div class="d-flex">
                   <div class="comment-img"><img src="{{ comment.author.profile.user_image.url }}" alt=""></div>
                   <div>
-                    <h5><a href="">{{ comment.author }}</a>
-                    </h5>
+                    <a href="{% url 'visible_profile' comment.author.username %}">
+                      <h5>{{ comment.author }}</h5>
+                    </a>
                     <time datetime="2020-01-01">{{ comment.created_at }}</time>
                     <p>
                       {{ comment.text }}
@@ -138,30 +143,37 @@
                 </div>
                 <button style="margin-left: 8%; background-color: white; padding-bottom: 12px; color: gray;" class="collapsible"><i class="bi bi-caret-down-fill"></i>agregar comentario</button>
                   <div class="content">
-                    <div class="reply-form-container" data-comment-id="{{ comment.id }}">
-                      <form action="{% url 'post_detail' product.pk %}" method="POST">
-                        {% csrf_token %}
-                        {{ reply_form.rating }}
-                        {{ reply_form.text }}
-                        <input type="hidden" name="comment_id" value="{{ comment.id }}">
-                        <div style="padding: 12px;">
-                          <button class="btn btn-primary" type="submit" style="float: right;">Submit</button>
-                        </div>
-                      </form>
-                    </div>
-                    {% for reply in comment.replies.all %}
-                    <div style="padding-left: 6px;" class="d-flex">
-                      <div class="comment-img"><img src="{{ reply.author.profile.user_image.url }}" alt=""></div>
-                      <div>
-                        <h5><a href="">{{ reply.author }}</a>
-                        </h5>
-                        <time datetime="2020-01-01">{{ reply.created_at }}</time>
-                        <p>
-                          {{ reply.text }}
-                        </p>
+                    {% if user.is_authenticated %}
+                      <div class="reply-form-container" data-comment-id="{{ comment.id }}">
+                        <form action="{% url 'post_detail' product.pk %}" method="POST">
+                          {% csrf_token %}
+                          {{ reply_form.rating }}
+                          {{ reply_form.text }}
+                          <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                          <div style="padding: 12px;">
+                            <button class="btn btn-primary" type="submit" style="float: right;">Submit</button>
+                          </div>
+                        </form>
                       </div>
-                        <p>valoración: {{ reply.rating }}/5</p>
-                    </div>
+                    {% else %}
+                      <div class="alert alert-primary" role="alert">
+                        Para comentar, tienes que <a href="{% url 'user_login' %}"><u>iniciar</u></a> sesión
+                      </div>
+                    {% endif %}
+                    {% for reply in comment.replies.all %}
+                      <div style="padding-left: 6px;" class="d-flex">
+                        <div class="comment-img"><img src="{{ reply.author.profile.user_image.url }}" alt=""></div>
+                        <div>
+                          <a href="{% url 'visible_profile' reply.author.username %}">
+                            <h5>{{ reply.author }}</h5>
+                          </a>
+                          <time datetime="2020-01-01">{{ reply.created_at }}</time>
+                          <p>
+                            {{ reply.text }}
+                          </p>
+                        </div>
+                          <p>valoración: {{ reply.rating }}/5</p>
+                      </div>
                     {% endfor %}
                   </div>
               {% empty %}

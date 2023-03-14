@@ -58,6 +58,7 @@ class Post(models.Model):
     is_active = models.BooleanField(default=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True, null=True)
+    favorite = models.ManyToManyField(User, related_name='favorites', blank=True)
 
     class Meta:
         verbose_name_plural = 'Posts'

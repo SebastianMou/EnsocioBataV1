@@ -23,7 +23,6 @@ from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm,
                     UserUpdateForm, ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm)
 from .models import Post, Category, Profile, Comment
 
-
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create your views here.
@@ -270,29 +269,6 @@ def all_posts(request):
     }
     return render(request, 'service/all_posts.html', context)
 
-# def post_detail(request, pk):
-#     post = get_object_or_404(Post, id=pk)
-#     reviews = Review.objects.filter(post=post)
-#     cout_reviews = Review.objects.filter(post=post).count()
-
-#     if request.method == 'POST':
-#         form = ReviewForm(request.POST)
-#         if form.is_valid():
-#             review = form.save(commit=False)
-#             review.user = request.user
-#             review.save()
-#             return redirect(reverse('post_detail', args=[post.pk]), context=context)
-#     else:
-#         form = ReviewForm()
-#     context = {
-#         'post': post,
-#         'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
-#         'reviews': reviews,
-#         'form': form,
-#         'cout_reviews': cout_reviews,
-#     }
-#     return render(request, 'service/post_detail.html', context)
-
 def post_detail(request, pk):
     product = get_object_or_404(Post, pk=pk)
     comments = product.comment_set.filter(parent__isnull=True)
@@ -399,3 +375,15 @@ def profile(request):
         'post_count': post_count,
     }
     return render(request, 'autho/profile.html', context)
+
+def visible_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=user)
+    post_count = Post.objects.filter(author=user).count()
+    context = {
+        'user': user,
+        'posts': posts,
+        'post_count': post_count,
+    }
+    return render(request, 'autho/visible_profile.html', context)
+

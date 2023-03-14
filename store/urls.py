@@ -10,6 +10,7 @@ urlpatterns = [
     path('delete_account/', views.delete_account, name='delete_account'),
     path('user_logout/', views.user_logout, name='user_logout'),
     path('profile/', views.profile, name='profile'),
+    path('visible_profile/<str:username>/', views.visible_profile, name='visible_profile'),
     # Controlling post
     path('create_post/', views.create_post, name='create_post'),
     path('all_posts/', views.all_posts, name='all_posts'),
