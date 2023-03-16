@@ -70,8 +70,8 @@
                                 <div class="card-body">
                                     <a href="{% url 'post_detail' post.pk %}">
                                         <div  class="d-flex" style="justify-content: space-between">
-                                            <h5 class="card-title">{{ post.title }}</h5>
-                                            <b>${{ post.get_display_price }}</b>
+                                            <h6 class="card-title">{{ post.title|slice:"40" }}</h6>
+                                            <small><b>${{ post.get_display_price }}</b></small>
                                         </div>
                                         <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
                                     </a>
@@ -88,17 +88,18 @@
                 <div class="row">
                     {% for category in categories %}
                     <div class="col">
-                        <div style="width: 70%;" class="card">
-                            <div class="card-body">
+                        <div  class="card">
+                            <center>
+                            <div class="card-body" style="width: 15rem">
                                 <a href="{% url 'category_list' category.pk %}">
-                                    <center>
-                                        <img style="width: 90px; height: auto;" src="{{ category.category_image.url }}" alt="">
-                                        <hr>
-                                        <small>{{ category.name }}</small>
-                                    </center>
+                                    <img style="width: 90px; height: auto;" src="{{ category.category_image.url }}" alt="">
+                                    <hr>
+                                    <small>{{ category.name }}</small>
                                 </a>
                             </div>
+                            </center>
                         </div>
+                        <br>
                     </div>
                     {% endfor %}
                 </div>

@@ -10,31 +10,31 @@ from .models import Account, Category, Post, Profile, Comment
 class UserSellerRegisterForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'First Name',
+        'placeholder': 'Nombre',
     }))
     last_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Last Name',
+        'placeholder': 'Apellido',
     }))
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Username',
+        'placeholder': 'Nombre de usuario',
     }))
     freelancer_key = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Phone Number',
+        'placeholder': 'Clave de freelancer',
     }))
     email = forms.EmailField(required=True, widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'email'
+        'placeholder': 'Correo electrónico'
     }))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'password1',
+        'placeholder': 'Contraseña',
     }))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'password1',
+        'placeholder': 'Confirmar contraseña',
     }))
 
     class Meta:
@@ -44,7 +44,7 @@ class UserSellerRegisterForm(UserCreationForm):
     def clean_freelancer_key(self):
         freelancer_key = self.cleaned_data.get('freelancer_key')
         if Account.objects.filter(freelancer_key=freelancer_key).exists():
-            raise ValidationError('This phone number is already registered.')
+            raise ValidationError('Esta clave de identificación ya está registrada.')
         return freelancer_key
 
     def save(self, commit=True):
@@ -199,7 +199,7 @@ class UpdatePostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['text', 'rating']
+        fields = ['text']
         widgets = {
             'text': forms.Textarea(attrs={
                 'class': 'form-control', 
@@ -207,25 +207,13 @@ class CommentForm(forms.ModelForm):
                 'rows': 4,
                 'cols': 50
             }),
-            'rating': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1, 
-                'max': 5, 
-                'step': 1
-            }),
         }
 
 class ReplyForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ['rating', 'text']
+        fields = ['text']
         widgets = {
-            'rating': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 1, 
-                'max': 5, 
-                'step': 1
-            }),
             'text': forms.Textarea(attrs={
                 'class': 'form-control', 
                 'id': 'reply-input',

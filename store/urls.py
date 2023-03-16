@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('seller_register/', views.seller_register, name='seller_register'),
+    path('seller_register/SVZOMGHDICY27X5-YWB5LZF2O3KXPSI-KI45BDEYRSQ0LFT-ELOWF93S846ATVQ/', views.seller_register, name='seller_register'),
     path('buyer_register/', views.buyer_register, name='buyer_register'),
     path('user_login/', views.user_login, name='user_login'),
     path('delete_account/', views.delete_account, name='delete_account'),
@@ -15,6 +15,7 @@ urlpatterns = [
     path('create_post/', views.create_post, name='create_post'),
     path('all_posts/', views.all_posts, name='all_posts'),
     path('post_detail/<int:pk>/', views.post_detail, name='post_detail'),
+    path('comment_delete/<int:pk>/', views.comment_delete, name='comment_delete'),
     path('edit_post/<int:pk>/', views.edit_post, name='edit_post'),
     path('delete/<int:post_id>/', views.delete, name='delete'),
     path('search/', views.search, name='search'),

@@ -30,6 +30,11 @@
                   {% endfor %}
                 </ul>
                 {% endif %}
+
+                {% if form.errors %}
+                    <p>username or password incorect</p>
+                {% endif %}
+                        
                 {% csrf_token %}
                 <!-- 2 column grid layout with text inputs for the first and last names -->
                 <div class="row">

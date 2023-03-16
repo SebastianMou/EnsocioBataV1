@@ -80,9 +80,9 @@
                         </ul>
                     </li>
                     {% if user.is_authenticated %}
-                        <li><a class="getstarted scrollto" href="{% url 'user_logout' %}">logout</a></li>
+                        <li><a class="getstarted scrollto" href="{% url 'user_logout' %}">Cerrar sesión</a></li>
                     {% else %}
-                        <li><a class="getstarted scrollto" href="{% url 'user_login' %}">Login</a></li>
+                        <li><a class="getstarted scrollto" href="{% url 'user_login' %}">Iniciar sesión</a></li>
                     {% endif %}
                 </ul>
                 <i class="bi bi-list mobile-nav-toggle"></i>

@@ -303,6 +303,15 @@ def post_detail(request, pk):
     }
     return render(request, 'service/post_detail.html', context)
 
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.method == 'POST' and request.user == comment.author:
+        comment.delete()
+        messages.success(request, 'Comment deleted successfully.')
+    else:
+        messages.error(request, 'Unable to delete comment.')
+    return redirect('post_detail', pk=comment.product.pk)
+
 def create_checkout_session(request, pk):
     product = get_object_or_404(Post, pk=pk)
     ng = "http://127.0.0.1:8000/"
