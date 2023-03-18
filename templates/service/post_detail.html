@@ -28,7 +28,7 @@
   <section class="breadcrumbs">
     <div class="container">
       <ol>
-        <li><a href="/">Casa</a></li>
+        <li><a href="/">Inicio</a></li>
         <li><a href="{% url 'all_posts' %}">Detalle</a></li>
       </ol>
       <h2>{{ product.title }}</h2>
@@ -80,11 +80,16 @@
                   <h4>|</h1>
                   </h4>
                   {% if request.user == product.author %}
-                    <li style="justify-content: space-between" class="d-flex align-items-center"><i class="bi bi-pen"></i>
-                      <a href="{% url 'edit_post' product.id %}">Edit</a></li>
-                    <li style="justify-content: space-between" class="d-flex align-items-center"><i class="bi bi-trash"></i>
-                      <a href="{% url 'delete' product.id %}">Delete</a></li>
+                    <li style="justify-content: space-between" class="d-flex align-items-center">
+                      <i class="bi bi-pen"></i>
+                      <a href="{% url 'edit_post' product.id %}">Edit</a>
+                    </li>
+                    <li style="justify-content: space-between" class="d-flex align-items-center">
+                      <i class="bi bi-trash"></i>
+                      <a href="{% url 'delete' product.id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?');">Delete</a>
+                    </li>
                   {% endif %}
+
               </ul>
             </div>
 

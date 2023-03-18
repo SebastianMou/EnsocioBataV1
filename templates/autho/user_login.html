@@ -33,6 +33,19 @@
                             {% endfor %}
                         </ul>
                         {% endif %}
+                        
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                            {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
                         {% csrf_token %}
                         <!-- Username input -->
                         <div class="form-outline mb-4">

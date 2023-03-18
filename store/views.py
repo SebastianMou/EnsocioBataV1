@@ -47,8 +47,8 @@ def home(request):
         send_mail(data['complaint'], message, '', ['ensocio.mx@gmail.com'])
 
     categories = Category.objects.filter(
-        Q(name__startswith='Vídeo y animación') | Q(name__startswith='Diseño gráfico') |
-        Q(name__startswith='Publicidad digital')
+        Q(name__startswith='Servicios de voz') | Q(name__startswith='Diseño gráfico') |
+        Q(name__startswith='Servicios de SEO')
     )[:3]
     context = {
         'categories': categories,
@@ -89,6 +89,9 @@ def user_login(request):
         if user is not None:
             login(request, user)
             return redirect('profile')
+        else:
+            messages.error(request, 'contraseña o nombre de usuario incorrecto')
+            return redirect('user_login')
     else:
         pass
     return render(request, 'autho/user_login.html')
@@ -145,6 +148,7 @@ def seller_register(request):
         form = UserSellerRegisterForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data.get('email')
+            username = form.cleaned_data.get('username')
             if User.objects.filter(email=email).exists():
                 messages.error(request, 'This email is already registered.')
                 return redirect('seller_register')
@@ -160,6 +164,7 @@ def seller_register(request):
         'form': form,
     }
     return render(request, 'autho/seller_register.html', context)
+
 
 def activate_buyer(request, uidb64, token):
     User = get_user_model()
@@ -201,7 +206,7 @@ def buyer_register(request):
         if form.is_valid():
             email = form.cleaned_data.get('email')
             if User.objects.filter(email=email).exists():
-                messages.error(request, 'This email is already registered.')
+                messages.error(request, 'Este correo electrónico ya está registrado.')
                 return redirect('buyer_register')
             else:
                 user = form.save(commit=False)
@@ -258,7 +263,7 @@ def delete(request, post_id=None):
     if post.author != request.user:
         return redirect('/')
     post.delete()
-    return redirect('/')
+    return redirect('profile')
 
 def all_posts(request):
     posts = Post.objects.all()

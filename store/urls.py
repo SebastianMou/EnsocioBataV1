@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
@@ -29,8 +30,8 @@ urlpatterns = [
     # path('activate_buyer/<uidb64>/<token>', views.activate_buyer, name='activate_buyer'),
 
     # User change password from account 
-    path('change_password/', auth_views.PasswordChangeView.as_view(template_name='authentication/password_change.html', success_url='/password_changed/'), name='password_change'),
-    path('password_changed/', auth_views.PasswordChangeDoneView.as_view(template_name='authentication/password_changed.html'), name='password_changed'),
+    path('change_password/', login_required(auth_views.PasswordChangeView.as_view(template_name='authentication/password_change.html', success_url='/password_changed/')), name='password_change'),
+    path('password_changed/', login_required(auth_views.PasswordChangeDoneView.as_view(template_name='authentication/password_changed.html')), name='password_changed'),    
     # Forgoten password
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='authentication/password_reset.html'), name="password_reset"),
     path('password_reset_sent/', auth_views.PasswordResetDoneView.as_view(template_name='authentication/password_reset_done.html'), name='password_reset_done'),

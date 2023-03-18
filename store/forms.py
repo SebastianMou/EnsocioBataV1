@@ -73,11 +73,11 @@ class UserBuyerRegisterForm(UserCreationForm):
     }))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'password1',
+        'placeholder': 'contraseña',
     }))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'password1',
+        'placeholder': 'Confirmar contraseña',
     }))
 
     class Meta:

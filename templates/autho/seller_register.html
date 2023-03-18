@@ -28,7 +28,7 @@
                     class="img-fluid" alt="Sample image">
             </div>
             <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                <h4>seller register</h4>
+                <h4>Registro de Freelancer</h4>
                 <form method="POST">
                     {% if messages %}
                     <ul class="messages">
@@ -37,9 +37,20 @@
                         {% endfor %}
                     </ul>
                     {% endif %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            {% for field in form %}
+                            {% for error in field.errors %}
+                                {{ field.label }}: {{ error }}
+                            {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <input value="Registro" type="submit" class="btn btn-primary form-control"></input>
+                    <input value="Registrarse" type="submit" class="btn btn-primary form-control"></input>
                 </form>
             </div>
         </div>
