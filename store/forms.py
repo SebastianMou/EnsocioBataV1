@@ -87,7 +87,12 @@ class UserBuyerRegisterForm(UserCreationForm):
 class PostForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select(attrs={
         'class': 'form-control',
-    }))
+    }), empty_label=None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].choices = [('','Buscar categoría escribiendo')] + list(self.fields['category'].choices)[1:]
+
     detailed_description = RichTextField()
     image = forms.ImageField(widget=ClearableFileInput(attrs={
         'class': 'form-control',
@@ -100,7 +105,7 @@ class PostForm(forms.ModelForm):
     }), required=False)
     price = forms.DecimalField(widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Enter price here (e.g. 10.99)',
+        'placeholder': 'Introduce el precio aquí (por ejemplo, 10.99)',
     }))
     is_active = forms.BooleanField(widget=forms.CheckboxInput(attrs={
         'class': 'form-check-input',
@@ -113,11 +118,11 @@ class PostForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter title here',
+                'placeholder': 'Ingrese el título aquí',
             }),
             'content': forms.Textarea(attrs={
                 'class': 'form-control',
-                'placeholder': 'Enter content here',
+                'placeholder': 'Explica brevemente sobre ti y que haces',
                 'rows': 10,
             }),
         }
@@ -160,7 +165,12 @@ class ProfileUpdateForm(forms.ModelForm):
 class UpdatePostForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select(attrs={
         'class': 'form-control',
-    }))
+    }), empty_label=None)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].choices = [('','Buscar categoría escribiendo')] + list(self.fields['category'].choices)[1:]
+
     title = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
         'placeholder': 'title',
@@ -174,7 +184,7 @@ class UpdatePostForm(forms.ModelForm):
     detailed_description = RichTextField()
     price = forms.DecimalField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Price',
+        'placeholder': 'Introduce el precio aquí (por ejemplo, 10.99)',
     }))
     is_active = forms.BooleanField(widget=forms.CheckboxInput(attrs={
         'class': 'form-check-input custom-control-input',

@@ -21,6 +21,9 @@ urlpatterns = [
     path('delete/<int:post_id>/', views.delete, name='delete'),
     path('search/', views.search, name='search'),
     path('category_list/<int:pk>', views.category_list, name='category_list'),
+
+    path('post/<int:post_id>/favorite/', views.favorite_view, name='post_favorite'),
+
     # Stripe Payment connection
     path('create_checkout_session/<int:pk>/', views.create_checkout_session, name='create_checkout_session'),
     path('checkout_success/', views.checkout_success, name='checkout_success'),

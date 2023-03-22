@@ -48,7 +48,7 @@ class Category(models.Model):
 class Post(models.Model):
     category = models.ForeignKey(Category, related_name='product', on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=255)
-    content = models.TextField()
+    content = models.TextField(max_length=1599)
     detailed_description = RichTextField(null=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images/', default='images/default_p_img.jpg', null=True)
@@ -82,3 +82,8 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return str(self.parent) + ' -> ' + str(self.author) + ' -> ' + str(self.text)
+
+class CartItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    

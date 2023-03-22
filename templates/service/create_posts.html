@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 <style>
-
     body {
         background-color: #e1e7ed;
         text-align: center;
@@ -92,7 +91,69 @@
         font-weight: 600;
         text-transform: uppercase;
     }
+
+    .alert-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .alert-box {
+        position: relative;
+        display: none;
+        width: 600px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 9px;
+        background-color: #fff;
+        animation: fade-in 0.5s ease-in-out forwards;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 3px;
+        right: 10px;
+        color: #aaa;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateX(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
 </style>
+<div class="alert-container">
+    <div class="alert-box" id="alertBox1">
+        <span class="close-btn" id="closeBtn1">&times;</span>
+        <div style="text-align: left;">
+            <small>Esta sección mostrará una breve descripción de lo que ofrece tu servicio, lo cual puede considerarse
+                como el punto de venta para el cliente</small>
+        </div>
+        <img class="img-fluid" src="{% static 'assets/img/create_post_help/resumen.png' %}" alt="" srcset="">
+    </div>
+    <div class="alert-box" id="alertBox2">
+        <span class="close-btn" id="closeBtn2">&times;</span>
+        <div style="text-align: left;">
+            <p>Ejemplo:</p>
+            <img class="img-fluid" src="{% static 'assets/img/create_post_help/detailed_dis.png' %}" alt="" srcset="">
+        </div>
+    </div>
+    <div class="alert-box" id="alertBox3">
+        <span class="close-btn" id="closeBtn3">&times;</span>
+        <div style="text-align: left;">
+            <p>This is alert box 3.</p>
+        </div>
+    </div>
+</div>
 <section id="" class="container-fluid d-flex align-items-center justify-content-between">
     <div class="container">
         <br><br>
@@ -101,33 +162,71 @@
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.media }}
+                    <div style="text-align: left;">
+                        <h6>Categoria</h6>
+                    </div>
                     {{ form.category }}
                     <br>
-                    {{ form.title }}
+
+                    <div style="width: 100%;" class="card">
+                        <div class="card-body">
+                            <div style="text-align: left;">
+                                <h6>Titulo</h6>
+                            </div>
+                            {{ form.title }}
+                            <br>
+                            <div style="text-align: left;">
+                                <h6 onclick="showAlert(1)">Que debo de ingresar aqui? <i style="color: blue;" class="bi bi-info-circle"></i></h6>
+                            </div>
+                            {{ form.content }}
+                            <br>
+                            <div style="text-align: left;">
+                                <h6 onclick="showAlert(2)">Que debo de ingresar aqui? <i style="color: blue;" class="bi bi-info-circle"></i></h6>
+                            </div>
+                            {{ form.detailed_description }}
+                        </div>
+                    </div>
+                    
                     <br>
-                    {{ form.content }}
+                    <div style="width: 100%;" class="card">
+                        <div class="card-body">
+                            <h5>imagens</h5>
+                            <div style="text-align: left;">
+                                <h6>imagen:</h6>
+                            </div>
+                            {{ form.image }}
+                            <br>
+                            <div style="text-align: left;">
+                                <h6>imagen:</h6>
+                            </div>
+                            {{ form.image2 }}
+                            <br>
+                            <div style="text-align: left;">
+                                <h6>imagen:</h6>
+                            </div>
+                            {{ form.image3 }}
+                        </div>
+                    </div>
                     <br>
-                    {{ form.detailed_description }}
-                    <br>
-                    {{ form.image }}
-                    <br>
-                    {{ form.image2 }}
-                    <br>
-                    {{ form.image3 }}
-                    <br>
+                    <div style="text-align: left;">
+                        <h6>Precio del producto</h6>
+                    </div>
                     {{ form.price }}
                     <br>
-                    <div class="card">
+                    <div style="text-align: left;">
+                        <h6 onclick="showAlert(3)">Que debo de ingresar aqui? <i style="color: blue;" class="bi bi-info-circle"></i></h6>
+                    </div>
+                    <div style="width: 100%;" class="card">
                         <div class="card-body">
                             <div class="d-flex">
                                 {{ form.is_active }}
-                                <p style="padding-left: 5px; color: #33363b;">Ester servicio esta activo?</p>
+                                <p style="padding-left: 5px; color: #33363b;"> Ester servicio esta activo?</p>
                             </div>
                         </div>
                     </div>
                     <br>
 
-                    <input value="Post" type="Submit" class="btn btn-primary">
+                    <input value="Publicar" type="Submit" class="btn btn-primary">
                 </form>
             </div>
             <div class="col-4">
@@ -139,20 +238,6 @@
                         <p>@{{ user.username }}</p>
                     </div>
                     <div class="card_count">
-                        <div class="count">
-                            <div class="fans">
-                                <h3>2.4M</h3>
-                                <p>Fans</p>
-                            </div>
-                            <div class="following">
-                                <h3>202</h3>
-                                <p>Followings</p>
-                            </div>
-                            <div class="post">
-                                <h3>552</h3>
-                                <p>Posts</p>
-                            </div>
-                        </div>
                         <div class="btn">Publicar</div>
                     </div>
                 </div>
@@ -160,4 +245,15 @@
         </div>
     </div>
 </section>
+<script>
+    function showAlert(alertBoxNum) {
+        const alertBox = document.getElementById(`alertBox${alertBoxNum}`);
+        alertBox.style.display = "block";
+
+        const closeBtn = document.getElementById(`closeBtn${alertBoxNum}`);
+        closeBtn.addEventListener("click", () => {
+            alertBox.style.display = "none";
+        });
+    }
+</script>
 {% endblock %}

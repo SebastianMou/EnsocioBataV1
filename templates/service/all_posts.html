@@ -70,10 +70,14 @@
                                 <div class="card-body">
                                     <a href="{% url 'post_detail' post.pk %}">
                                         <div  class="d-flex" style="justify-content: space-between">
-                                            <h6 class="card-title">{{ post.title|slice:"40" }}</h6>
+                                            <div style="text-align: left;">
+                                                <h6 class="card-title">{{ post.title|slice:"40" }}</h6>
+                                            </div>
                                             <small><b>${{ post.get_display_price }}</b></small>
                                         </div>
-                                        <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
+                                        <div style="text-align: left;">
+                                            <h6 class="card-subtitle mb-2 text-muted">{{ post.category }}</h6>
+                                        </div>
                                     </a>
                                 </div>
                             </div>

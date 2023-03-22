@@ -59,7 +59,7 @@
                   </div>
 
                   <div class="swiper-slide">
-                    <img style="width: 98%; height: auto;" src="{{ product.image3.url }}" alt="">
+                    <img style="width: 98%; height: auto;" data-bs-toggle="modal" data-bs-target="#exampleModal2" src="{{ product.image3.url }}" alt="">
                   </div>
 
                 </div>
@@ -74,34 +74,58 @@
             <div class="entry-meta">
               <ul>
                 <li class="d-flex align-items-center"><i class="bi bi-person"></i><a href="{% url 'visible_profile' product.author.username %}">{{ product.author }}</a></li>
-                <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a href=""><time datetime="2020-01-01">{{ product.created_at }}</time></a></li>
+                <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a href=""><time datetime="2020-01-01">{{ product.created_at|naturaltime }}</time></a></li>
                 <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a href="">{{ cout_reviews }} Comentarios</a></li>
-                <li class="d-flex align-items-center"><i class=""></i>
-                  <h4>|</h1>
-                  </h4>
-                  {% if request.user == product.author %}
-                    <li style="justify-content: space-between" class="d-flex align-items-center">
-                      <i class="bi bi-pen"></i>
-                      <a href="{% url 'edit_post' product.id %}">Edit</a>
-                    </li>
-                    <li style="justify-content: space-between" class="d-flex align-items-center">
-                      <i class="bi bi-trash"></i>
-                      <a href="{% url 'delete' product.id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?');">Delete</a>
-                    </li>
+               
+                {% if user.is_authenticated %}
+                <form action="{% url 'post_favorite' post_id=product.id %}" method="post">
+                  {% csrf_token %}
+                  {% if is_favorite %}
+                  <button type="submit" class="btn btn-link">
+                    <svg style="width: 17px; height: auto;" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                      fill="currentColor" class="bi bi-bookmark-check-fill" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd"
+                        d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5zm8.854-9.646a.5.5 0 0 0-.708-.708L7.5 7.793 6.354 6.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z" />
+                    </svg>
+                  </button>
+                  {% else %}
+                  <button type="submit" class="btn btn-link">
+                    <svg style="width: 17px; height: auto;" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                      fill="currentColor" class="bi bi-bookmark" viewBox="0 0 16 16">
+                      <path
+                        d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z" />
+                    </svg>
+                  </button>
                   {% endif %}
+                </form>
+                {% else %}
+                <a href="{% url 'user_login' %}">
+                  <button type="submit" class="btn btn-link">
+                    <svg style="width: 17px; height: auto;" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                      fill="currentColor" class="bi bi-bookmark-check-fill" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd"
+                        d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5zm8.854-9.646a.5.5 0 0 0-.708-.708L7.5 7.793 6.354 6.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z" />
+                    </svg>
+                  </button>
+                </a>
+                {% endif %}
 
+                <h4 style="padding-right: 12px;">|</h1>
+                {% if request.user == product.author %}
+                  <li style="justify-content: space-between" class="d-flex align-items-center">
+                    <i class="bi bi-pen"></i>
+                    <a href="{% url 'edit_post' product.id %}">Editar</a>
+                  </li>
+                  <li style="justify-content: space-between" class="d-flex align-items-center">
+                    <i class="bi bi-trash"></i>
+                    <a href="{% url 'delete' product.id %}" onclick="return confirm('¿Estás seguro de que deseas eliminar este elemento?');">Borrar</a>
+                  </li>
+                {% endif %}
               </ul>
             </div>
 
             <div class="entry-content">
-              <div class="blog-author d-flex align-items-center">
-                <div>
-                  <h5>Conclucion</h5>
-                  <p style="color: rgb(106, 106, 106);">
-                    {{ product.content }}
-                  </p>
-                </div>
-              </div><!-- End blog author bio -->
+              
               <p>{{ product.detailed_description|safe }}</p>
             </div>
 
@@ -113,6 +137,14 @@
             </div>
 
           </article><!-- End blog entry -->
+          <div class="blog-author d-flex align-items-center">
+            <div>
+              <h5>Sobre Mi</h5>
+              <p style="color: rgb(106, 106, 106);">
+                {{ product.content }}
+              </p>
+            </div>
+          </div><!-- End blog author bio -->
 
           <div class="blog-comments">
             
@@ -197,12 +229,13 @@
                     {% endfor %}
                   </div>
               {% empty %}
-                <p>No comments yet.</p>
+                <p>Sin comentarios aún.</p>
               {% endfor %}
 
             </div><!-- End comment #1 -->
 
           </div><!-- End blog comments -->
+          
         </div><!-- End blog entries list -->
 
 
@@ -229,12 +262,15 @@
                   </form>
               </div>
             </div>
+            
           </div><!-- End sidebar recent posts-->
 
         </div><!-- End sidebar -->
 
       </div><!-- End blog sidebar -->
+  
     </div>
+    
     </div>
   </section><!-- End Blog Single Section -->
 </main><!-- End #main -->
@@ -307,7 +343,7 @@
   </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -321,7 +357,7 @@
               <img src="{{ product.image3.url }}" class="d-block w-100" alt="...">
             </div>
             <div class="carousel-item">
-              <img src="{{ product.imag2.url }}" class="d-block w-100" alt="...">
+              <img src="{{ product.image2.url }}" class="d-block w-100" alt="...">
             </div>
             <div class="carousel-item">
               <img src="{{ product.image.url }}" class="d-block w-100" alt="...">

@@ -21,7 +21,7 @@ from django.http import JsonResponse
 
 from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, 
                     UserUpdateForm, ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm)
-from .models import Post, Category, Profile, Comment
+from .models import Post, Category, Profile, Comment, CartItem
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -278,6 +278,12 @@ def post_detail(request, pk):
     product = get_object_or_404(Post, pk=pk)
     comments = product.comment_set.filter(parent__isnull=True)
     cout_reviews = Comment.objects.filter(product=product).count()
+    
+    if request.user.is_authenticated:
+        is_favorite = product.cartitem_set.filter(user=request.user).exists()
+    else:
+        is_favorite = None
+
     if request.method == 'POST':
         form = CommentForm(request.POST)
         reply_form = ReplyForm(request.POST)
@@ -305,6 +311,7 @@ def post_detail(request, pk):
         'form': form,
         'reply_form': reply_form,
         'cout_reviews': cout_reviews,
+        'is_favorite': is_favorite,
     }
     return render(request, 'service/post_detail.html', context)
 
@@ -367,6 +374,10 @@ def search(request):
 @login_required
 def profile(request):
     posts = Post.objects.filter(author=request.user)
+
+    favorite_posts = CartItem.objects.filter(user=request.user).values_list('post', flat=True)
+    cart_items = Post.objects.filter(id__in=favorite_posts)
+
     post_count = Post.objects.count()
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -387,8 +398,16 @@ def profile(request):
         'p_form': p_form,
         'posts': posts,
         'post_count': post_count,
+        'cart_items': cart_items,
     }
     return render(request, 'autho/profile.html', context)
+
+def favorite_view(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    favorite, created = CartItem.objects.get_or_create(user=request.user, post=post)
+    if not created:
+        favorite.delete()
+    return redirect('post_detail', pk=post.pk)
 
 def visible_profile(request, username):
     user = get_object_or_404(User, username=username)
@@ -400,4 +419,3 @@ def visible_profile(request, username):
         'post_count': post_count,
     }
     return render(request, 'autho/visible_profile.html', context)
-
