@@ -377,8 +377,8 @@ def profile(request):
 
     favorite_posts = CartItem.objects.filter(user=request.user).values_list('post', flat=True)
     cart_items = Post.objects.filter(id__in=favorite_posts)
+    post_count = Post.objects.filter(author=request.user).count()
 
-    post_count = Post.objects.count()
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         profile, created = Profile.objects.get_or_create(user=request.user)  # If the switch is True, that means Django had to create a new Profile object for the user because it couldn't find an existing one
@@ -387,11 +387,23 @@ def profile(request):
             u_form.save()
             p_form.save()
             messages.success(request, 'not loged-in')
-            return redirect('profile')
+            # get all comments on user's posts
+            comments = Comment.objects.filter(product__author=request.user)
+            context = {
+                'u_form': u_form,
+                'p_form': p_form,
+                'posts': posts,
+                'post_count': post_count,
+                'cart_items': cart_items,
+                'comments': comments,
+            }
+            return render(request, 'autho/profile.html', context)
     else: 
         u_form = UserUpdateForm(instance=request.user)
         profile, created = Profile.objects.get_or_create(user=request.user)
         p_form = ProfileUpdateForm(instance=profile)
+
+    comments = Comment.objects.filter(product__author=request.user)
 
     context = {
         'u_form': u_form,
@@ -399,6 +411,7 @@ def profile(request):
         'posts': posts,
         'post_count': post_count,
         'cart_items': cart_items,
+        'comments': comments,
     }
     return render(request, 'autho/profile.html', context)
 

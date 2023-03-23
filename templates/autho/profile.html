@@ -111,7 +111,8 @@
                             <nav class="nav nav-tabs" id="nav-tab" role="tablist">
                                 <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Publicaciones</a>
                                 <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Favorito</a>
-                              </nav>
+                                <a class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" href="#nav-disabled" role="tab" aria-controls="nav-disabled" tabindex="-1">Commentarios</a>
+                            </nav>
                               <div class="tab-content" id="nav-tabContent">
                                 <br>
                                 <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
@@ -176,8 +177,28 @@
                                         <p>Aún no hay publicaciones favoritas.</p>
                                     {% endfor %}
                                 </div>
-                              </div>
-                            
+                                <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab">
+                                    {% for x in comments %}
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <a href="{% url 'post_detail' x.product.pk %}">
+                                                    <div class="d-flex">
+                                                        <img style="width: 15%; height: auto;" src="{{ x.product.image.url }}" alt="" srcset="">
+                                                        
+                                                        <div style="padding-left: 12px;">
+                                                            <p>{{ x.product.title }}</p>
+                                                            <div class="d-flex">
+                                                                <img style="width: 20px; height: auto;" src="{{ x.author.profile.user_image.url }}" alt="" srcset="">
+                                                                <h6 style="padding-right: 12px;">{{ x.text }} - {{ x.author }}</h6>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         {% else %}
                             <h4>Marcador</h4>
                             <p>quieres ser parte del equipo de <a href=""><u>Ensocio</u></a>?</p>
