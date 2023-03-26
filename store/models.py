@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
 from django.core.validators import FileExtensionValidator
 from PIL import Image
+from django.urls import reverse
 
 # Create your models here.
 class Account(models.Model):
@@ -19,6 +20,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.CharField(default='Hi my name is ... ', max_length=355)
     user_image = models.ImageField(upload_to='media', validators=[FileExtensionValidator(['png', 'jpg'])], default='default.png')
+    is_active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return f'profile of -> {self.user.username}'
@@ -50,6 +52,20 @@ class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField(max_length=1599)
     detailed_description = RichTextField(null=True)
+    STATUS_CHOICES = (
+        ('1 día', '1 día'),
+        ('2 días', '2 días'),
+        ('3 días', '3 días'),
+        ('4 días', '4 días'),
+        ('5 días', '5 días'),
+        ('6 días', '6 días'),
+        ('1 semana', '1 semana'),
+        ('2 semanas', '2 semanas'),
+        ('3 semanas', '3 semanas'),
+        ('1 mes', '1 mes'),
+        ('2 meses', '2 meses'),
+    )
+    delivery_time = models.CharField(max_length=20, choices=STATUS_CHOICES, default='1 día')
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images/', default='images/default_p_img.jpg', null=True)
     image2 = models.ImageField(upload_to='images/', default='images/default_p_img.jpg', null=True)
@@ -59,6 +75,15 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True, null=True)
     favorite = models.ManyToManyField(User, related_name='favorites', blank=True)
+    likes = models.ManyToManyField(User, related_name='likes')
+    dislikes = models.ManyToManyField(User, related_name='dislikes')
+
+    def related_products(self):
+        return Post.objects.filter(category=self.category).exclude(id=self.id)
+    
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.id)])
+
 
     class Meta:
         verbose_name_plural = 'Posts'

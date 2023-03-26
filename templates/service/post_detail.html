@@ -134,6 +134,11 @@
               <ul class="cats">
                 <li><a href="{% url 'category_list' product.id %}">{{ product.category }}</a></li>
               </ul>
+              <button class="btn btn-primary btn-sm" onclick="shareOnFacebook('{{ request.build_absolute_uri }}')"><i style="color: white;" class="bi bi-facebook"></i> Facebook</button>
+              <button class="btn btn-info btn-sm" onclick="shareOnTwitter('{{ request.build_absolute_uri }}')"><i style="color: white;" class="bi bi-twitter"></i> Twitter</button>
+              <button class="btn btn-success btn-sm" onclick="shareOnLinkedIn('{{ request.build_absolute_uri }}')"><i style="color: white;" class="bi bi-linkedin"></i> LinkedIn</button>
+              <button class="btn btn-danger btn-sm" onclick="shareOnReddit('{{ request.build_absolute_uri }}')"><i style="color: white;" class="bi bi-reddit"></i> Reddit</button>
+              <button class="btn btn-warning btn-sm" onclick="copyToClipboard()"><i style="color: black;" class="bi bi-share"></i> Copiar</button>
             </div>
 
           </article><!-- End blog entry -->
@@ -255,22 +260,47 @@
             <div class="card">
               <div class="card-body">
                 <center><h4 style="color: green;">${{ product.get_display_price }}</h4></center>
-                  <!-- updated form action with product ID/pk as a URL parameter -->
-                  <form action="{% url 'create_checkout_session' product.pk %}" method="POST">
-                    {% csrf_token %}
-                    <button class="btn btn-primary form-control" type="submit" id="checkout-button">Checkout</button>
-                  </form>
+                <!-- updated form action with product ID/pk as a URL parameter -->
+                <form action="{% url 'create_checkout_session' product.pk %}" method="POST">
+                  {% csrf_token %}
+                  <button class="btn btn-primary form-control" type="submit" id="checkout-button">Checkout</button>
+                </form>
               </div>
             </div>
-            
+            <br>
+            <div class="d-flex">
+              <p style="padding-right: 13px;"><i style="color: green;" class="bi bi-hand-thumbs-up-fill"></i> {{ product.likes.count }}</p>
+              <p><i style="color: red;" class="bi bi-hand-thumbs-down-fill"></i> {{ product.dislikes.count }}</p>
+            </div>
+            {% if user.is_authenticated %}
+              {% if user in product.likes.all %}
+                  <p>¡Ya has dado me gusta a esta publicación!</p>
+              {% elif user in product.dislikes.all %}
+                  <p>¡Ya has dado no me gusta a esta publicación!</p>
+              {% else %}
+                <div class="d-flex">
+                    <form method="POST" action="{% url 'post_like' product.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-primary btn-sm btn-block"><i class="bi bi-hand-thumbs-up-fill"></i></button>
+                    </form>
+                    <form method="POST" action="{% url 'post_dislike' product.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-danger btn-sm btn-block"><i class="bi bi-hand-thumbs-down-fill"></i></button>
+                    </form>
+                </div>
+              {% endif %}
+            {% endif %}
+            <div class="d-flex">
+              <i style="padding-right: 5px;" class="bi bi-clock-history"></i>
+              <p>{{ product.delivery_time }}</p>
+            </div>
           </div><!-- End sidebar recent posts-->
-
+          {% for product in related_products %}
+            <li><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></li>
+          {% endfor %}
         </div><!-- End sidebar -->
-
       </div><!-- End blog sidebar -->
-  
     </div>
-    
     </div>
   </section><!-- End Blog Single Section -->
 </main><!-- End #main -->
@@ -380,15 +410,78 @@
   var coll = document.getElementsByClassName("collapsible");
   var i;
   for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function() {
+    coll[i].addEventListener("click", function () {
       this.classList.toggle("active");
       var content = this.nextElementSibling;
-      if (content.style.maxHeight){
+      if (content.style.maxHeight) {
         content.style.maxHeight = null;
       } else {
         content.style.maxHeight = content.scrollHeight + "px";
-      } 
+      }
     });
+  }
+  function likePost(post_id) {
+    $.ajax({
+      url: '/post/' + post_id + '/like/',
+      success: function (data) {
+        if (data.success) {
+          // Update the UI to reflect the new like count
+        } else {
+          // Display an error message
+        }
+      }
+    });
+  }
+
+  function shareOnFacebook(url) {
+    // Define the title of the content you want to share
+    var title = "{{ product.title }}";
+    // Use the Facebook API to open a share dialog
+    window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url) + "&t=" + encodeURIComponent(title), "_blank");
+  }
+  function shareOnTwitter(url) {
+    // Define the title of the content you want to share
+    var title = "{{ product.title }}";
+
+    // Use the Twitter API to open a share dialog
+    window.open("https://twitter.com/intent/tweet?url=" + encodeURIComponent(url) + "&text=" + encodeURIComponent(title), "_blank");
+  }
+  function shareOnReddit(url) {
+    // Define the title and URL of the content you want to share
+    var title = "{{ product.title }}";
+
+    // Use the Reddit API to open a share dialog
+    window.open("https://www.reddit.com/submit?title=" + encodeURIComponent(title) + "&url=" + encodeURIComponent(url), "_blank");
+  }
+  function shareOnLinkedIn(url) {
+    // Define the title and summary of the content you want to share
+    var title = "{{ product.title }}";
+    var summary = "This is a great resource that I think you'll find helpful.";
+
+    // Use the LinkedIn API to open a share dialog
+    window.open("https://www.linkedin.com/shareArticle?mini=true&url=" + encodeURIComponent(url) + "&title=" + encodeURIComponent(title) + "&summary=" + encodeURIComponent(summary), "_blank");
+  }
+  // copy to board
+  function copyToClipboard() {
+    // Get the current URL
+    var currentUrl = window.location.href;
+
+    // Create a temporary input element to hold the URL
+    var tempInput = document.createElement("input");
+    tempInput.value = currentUrl;
+    document.body.appendChild(tempInput);
+
+    // Select the input element
+    tempInput.select();
+
+    // Copy the URL to clipboard
+    document.execCommand("copy");
+
+    // Remove the temporary input element
+    document.body.removeChild(tempInput);
+
+    // Display a message to indicate that the URL has been copied
+    alert("Enlace copiado al portapapeles!");
   }
 </script>
 {% endblock %}

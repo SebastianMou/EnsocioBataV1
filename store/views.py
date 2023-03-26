@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+from django.utils import timezone
 
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -278,7 +279,10 @@ def post_detail(request, pk):
     product = get_object_or_404(Post, pk=pk)
     comments = product.comment_set.filter(parent__isnull=True)
     cout_reviews = Comment.objects.filter(product=product).count()
-    
+    current_url = request.build_absolute_uri()
+
+    related_products = product.related_products()
+
     if request.user.is_authenticated:
         is_favorite = product.cartitem_set.filter(user=request.user).exists()
     else:
@@ -312,6 +316,8 @@ def post_detail(request, pk):
         'reply_form': reply_form,
         'cout_reviews': cout_reviews,
         'is_favorite': is_favorite,
+        'current_url': current_url,
+        'related_products': related_products,
     }
     return render(request, 'service/post_detail.html', context)
 
@@ -350,6 +356,24 @@ def create_checkout_session(request, pk):
         return redirect(checkout_session.url)
     else:
         return JsonResponse({'error': 'Invalid request method'})
+
+def post_like(request, pk):
+    post = get_object_or_404(Post, id=pk)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+        post.dislikes.remove(request.user)
+    return redirect('post_detail', pk=post.id)
+
+def post_dislike(request, pk):
+    post = get_object_or_404(Post, id=pk)
+    if request.user in post.dislikes.all():
+        post.dislikes.remove(request.user)
+    else:
+        post.dislikes.add(request.user)
+        post.likes.remove(request.user)
+    return redirect('post_detail', pk=post.id)
 
 def checkout_success(request):
     return render(request, 'checkout_success.html')
@@ -426,9 +450,16 @@ def visible_profile(request, username):
     user = get_object_or_404(User, username=username)
     posts = Post.objects.filter(author=user)
     post_count = Post.objects.filter(author=user).count()
+    last_login = user.last_login
+    current_time = timezone.now()
+    if current_time - last_login < timezone.timedelta(minutes=5):
+        is_active = True
+    else:
+        is_active = False
     context = {
         'user': user,
         'posts': posts,
         'post_count': post_count,
+        'is_active': is_active,
     }
     return render(request, 'autho/visible_profile.html', context)

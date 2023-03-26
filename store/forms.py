@@ -94,6 +94,22 @@ class PostForm(forms.ModelForm):
         self.fields['category'].choices = [('','Buscar categoría escribiendo')] + list(self.fields['category'].choices)[1:]
 
     detailed_description = RichTextField()
+    STATUS_CHOICES = (
+        ('1 día', '1 día'),
+        ('2 días', '2 días'),
+        ('3 días', '3 días'),
+        ('4 días', '4 días'),
+        ('5 días', '5 días'),
+        ('6 días', '6 días'),
+        ('1 semana', '1 semana'),
+        ('2 semanas', '2 semanas'),
+        ('3 semanas', '3 semanas'),
+        ('1 mes', '1 mes'),
+        ('2 meses', '2 meses'),
+    )
+    delivery_time = forms.ChoiceField(choices=STATUS_CHOICES, widget=forms.Select(attrs={
+        'class': 'form-control', 
+    }))
     image = forms.ImageField(widget=ClearableFileInput(attrs={
         'class': 'form-control',
     }), required=False)
@@ -114,7 +130,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['category', 'title', 'content', 'detailed_description', 'image', 'image2', 'image3', 'price', 'is_active']
+        fields = ['category', 'title', 'content', 'delivery_time', 'detailed_description', 'image', 'image2', 'image3', 'price', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -171,6 +187,22 @@ class UpdatePostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['category'].choices = [('','Buscar categoría escribiendo')] + list(self.fields['category'].choices)[1:]
 
+    STATUS_CHOICES = (
+        ('1 día', '1 día'),
+        ('2 días', '2 días'),
+        ('3 días', '3 días'),
+        ('4 días', '4 días'),
+        ('5 días', '5 días'),
+        ('6 días', '6 días'),
+        ('1 semana', '1 semana'),
+        ('2 semanas', '2 semanas'),
+        ('3 semanas', '3 semanas'),
+        ('1 mes', '1 mes'),
+        ('2 meses', '2 meses'),
+    )
+    delivery_time = forms.ChoiceField(choices=STATUS_CHOICES, widget=forms.Select(attrs={
+        'class': 'form-control', 
+    }))
     title = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
         'placeholder': 'title',
@@ -202,7 +234,7 @@ class UpdatePostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = [
-            'category', 'title', 'content', 'detailed_description', 
+            'category', 'title', 'content', 'delivery_time', 'detailed_description', 
             'image', 'image2', 'image3', 'price', 'is_active',
         ]
 

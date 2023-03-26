@@ -144,7 +144,7 @@
         <span class="close-btn" id="closeBtn2">&times;</span>
         <div style="text-align: left;">
             <p>This is alert box 2.</p>
-            <img src="{% static 'assets/img/create_post_help/detailed_dis.png' %}" alt="" srcset="">
+            <img class="img-fluid" src="{% static 'assets/img/create_post_help/detailed_dis.png' %}" alt="" srcset="">
         </div>
     </div>
     <div class="alert-box" id="alertBox3">
@@ -184,6 +184,11 @@
                                 <h6 onclick="showAlert(2)">Que debo de ingresar aqui? <i style="color: blue;" class="bi bi-info-circle"></i></h6>
                             </div>
                             {{ form.detailed_description }}
+                            <br>
+                            <div style="text-align: left;">
+                                <h6>tiempo de entrega</h6>
+                            </div>
+                            {{ form.delivery_time }}
                         </div>
                     </div>
                     
