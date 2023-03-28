@@ -201,38 +201,67 @@
                                 </div>
                             </div>
                         {% else %}
-                            <h4>Marcador</h4>
-                            <p>quieres ser parte del equipo de <a href=""><u>Ensocio</u></a>?</p>
-                            {% for item in cart_items %}
-                                <div class="card mb-3">
-                                    <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <center>
-                                            <img style="width: 60%; height: auto;" src="{{ item.image.url }}" class="img-fluid rounded-start" alt="servicio">
-                                        </center>
+                        <nav class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Favorito</a>
+                            <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Commentarios</a>
+                        </nav>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                                <br>
+                                {% for item in cart_items %}
+                                    <div class="card mb-3">
+                                        <div class="row g-0">
+                                        <div class="col-md-4">
+                                            <center>
+                                                <img style="width: 60%; height: auto;" src="{{ item.image.url }}" class="img-fluid rounded-start" alt="servicio">
+                                            </center>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="card-body">
+                                                <a href="{% url 'post_detail' item.pk %}">
+                                                    <div class="d-flex" style="justify-content: space-between">
+                                                        <h5 class="card-title">{{ item.title }}</h5>
+                                                        <a href="{% url 'category_list' item.category.pk %}">
+                                                            <p><span class="badge bg-warning text-dark">{{ item.category }}</span></p>
+                                                        </a>
+                                                    </div>
+                                                    <p class="card-text">{{ item.content|slice:'200' }}</p>
+                                                    <div class="d-flex" style="justify-content: space-between">
+                                                        <p class="card-text"><small class="text-muted">{{ item.created_at }}</small></p>
+                                                        <p class="card-text" style="color: green;"><small>${{ item.get_display_price }}</small></p>  
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-8">
+                                {% empty %}
+                                    <p>Aún no hay publicaciones favoritas.</p>
+                                {% endfor %}
+                            </div>
+                            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                {% for comment in comments_reply_post %}
+                                    <br>
+                                    <div class="card">
                                         <div class="card-body">
-                                            <a href="{% url 'post_detail' item.pk %}">
-                                                <div class="d-flex" style="justify-content: space-between">
-                                                    <h5 class="card-title">{{ item.title }}</h5>
-                                                    <a href="{% url 'category_list' item.category.pk %}">
-                                                        <p><span class="badge bg-warning text-dark">{{ item.category }}</span></p>
-                                                    </a>
-                                                </div>
-                                                <p class="card-text">{{ item.content|slice:'200' }}</p>
-                                                <div class="d-flex" style="justify-content: space-between">
-                                                    <p class="card-text"><small class="text-muted">{{ item.created_at }}</small></p>
-                                                    <p class="card-text" style="color: green;"><small>${{ item.get_display_price }}</small></p>  
+                                            <a href="{% url 'post_detail' comment.product.pk %}">
+                                                <div class="d-flex">
+                                                    <img style="width: 15%; height: auto;" src="{{ comment.product.image.url }}" alt="" srcset="">
+                                                    
+                                                    <div style="padding-left: 10%; padding-left: 12px;">
+                                                        <h5>{{ comment.product.title }}</h5>
+                                                        <div class="d-flex">
+                                                            <h6 style="padding-right: 4px;">@{{ comment.author }}:</h6>
+                                                            <h6 style="color: gray;"><b>{{ comment.text }}</b></h6>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </a>
                                         </div>
                                     </div>
-                                    </div>
-                                </div>
-                            {% empty %}
-                                <p>Aún no hay publicaciones favoritas.</p>
-                            {% endfor %}
+                                {% endfor %}
+                            </div>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -288,10 +317,10 @@
                             <hr>
                             <div class="d-flex">
                                 <button type="button" class="btn btn-primary mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                    Update
+                                    Actualizar
                                 </button>
                                 <a href="{% url 'delete_account' %}" type="button" class="btn btn-danger form-control">
-                                    Delete
+                                    Borrar
                                 </a>
                             </div>
                         </div>

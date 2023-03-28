@@ -248,7 +248,7 @@
           <div class="sidebar">
             <div class="sidebar-item search-form">
               <div class="portfolio-info">
-                <h3>Project information</h3>
+                <h3>Información</h3>
                 <ul>
                   <li><strong>Categoría</strong>: <a href="{% url 'category_list' product.category.pk %}">{{ product.category }}</a></li>
                   <li><strong>Subido</strong>: {{ product.created_at }}</li>
@@ -259,19 +259,34 @@
             </div><!-- End sidebar search formn-->
             <div class="card">
               <div class="card-body">
-                <center><h4 style="color: green;">${{ product.get_display_price }}</h4></center>
+                <div class="row">
+                  <div class="col">
+                    <p>{{ product.category }}</p>
+                    <p>Entrega</p>
+                    <p>Valoración</p>
+                  </div>
+                  <div class="col">
+                    <div style="float: right;">
+                      <p>${{ product.get_display_price }}</p>
+                      <div class="d-flex">
+                        <i style="padding-right: 5px;" class="bi bi-clock-history"></i>
+                        <p>{{ product.delivery_time }}</p>
+                      </div>
+                      <div class="d-flex">
+                        <p style="padding-right: 13px;"><i style="color: green;" class="bi bi-hand-thumbs-up-fill"></i> {{ product.likes.count }}</p>
+                        <p><i style="color: red;" class="bi bi-hand-thumbs-down-fill"></i> {{ product.dislikes.count }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <!-- updated form action with product ID/pk as a URL parameter -->
                 <form action="{% url 'create_checkout_session' product.pk %}" method="POST">
                   {% csrf_token %}
-                  <button class="btn btn-primary form-control" type="submit" id="checkout-button">Checkout</button>
+                  <button class="btn btn-primary form-control" type="submit" id="checkout-button">Comprar ahorita</button>
                 </form>
               </div>
             </div>
             <br>
-            <div class="d-flex">
-              <p style="padding-right: 13px;"><i style="color: green;" class="bi bi-hand-thumbs-up-fill"></i> {{ product.likes.count }}</p>
-              <p><i style="color: red;" class="bi bi-hand-thumbs-down-fill"></i> {{ product.dislikes.count }}</p>
-            </div>
             {% if user.is_authenticated %}
               {% if user in product.likes.all %}
                   <p>¡Ya has dado me gusta a esta publicación!</p>
@@ -290,14 +305,35 @@
                 </div>
               {% endif %}
             {% endif %}
-            <div class="d-flex">
-              <i style="padding-right: 5px;" class="bi bi-clock-history"></i>
-              <p>{{ product.delivery_time }}</p>
-            </div>
           </div><!-- End sidebar recent posts-->
-          {% for product in related_products %}
-            <li><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></li>
-          {% endfor %}
+          <h3>Productos Similares</h3>
+          {% if related_products %}
+            {% for product in related_products %}
+              <div class="card">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <img src="{{ product.image.url }}" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <a href="{{ product.get_absolute_url }}">
+                          <small>{{ product.title }}</small>
+                        </a>
+                        <br>
+                        <small style="font-size: 12px; color: gray;">{{ product.created_at|naturaltime }}</small>
+                    </div>
+                  </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <br>
+            <center>
+              <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-emoji-frown" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.498 3.498 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.498 4.498 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683zM7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+              </svg>
+              <p>No hay productos similares</p>
+            </center>
+          {% endif %}
         </div><!-- End sidebar -->
       </div><!-- End blog sidebar -->
     </div>

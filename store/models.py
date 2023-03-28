@@ -79,11 +79,10 @@ class Post(models.Model):
     dislikes = models.ManyToManyField(User, related_name='dislikes')
 
     def related_products(self):
-        return Post.objects.filter(category=self.category).exclude(id=self.id)
+        return Post.objects.filter(category=self.category).exclude(id=self.id).order_by('?')[:5]
     
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.id)])
-
 
     class Meta:
         verbose_name_plural = 'Posts'

@@ -279,8 +279,7 @@ def post_detail(request, pk):
     product = get_object_or_404(Post, pk=pk)
     comments = product.comment_set.filter(parent__isnull=True)
     cout_reviews = Comment.objects.filter(product=product).count()
-    current_url = request.build_absolute_uri()
-
+    # current_url = request.build_absolute_uri()
     related_products = product.related_products()
 
     if request.user.is_authenticated:
@@ -316,7 +315,7 @@ def post_detail(request, pk):
         'reply_form': reply_form,
         'cout_reviews': cout_reviews,
         'is_favorite': is_favorite,
-        'current_url': current_url,
+        # 'current_url': current_url,
         'related_products': related_products,
     }
     return render(request, 'service/post_detail.html', context)
@@ -344,6 +343,7 @@ def create_checkout_session(request, pk):
                         'unit_amount': product.price,
                         'product_data': {
                             'name': product.title,
+                            'description': product.category,
                         },
                     },
                     'quantity': 1,
@@ -413,6 +413,9 @@ def profile(request):
             messages.success(request, 'not loged-in')
             # get all comments on user's posts
             comments = Comment.objects.filter(product__author=request.user)
+            # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
+            comments_reply_post = Comment.objects.filter(parent__product__author=request.user)
+
             context = {
                 'u_form': u_form,
                 'p_form': p_form,
@@ -420,6 +423,7 @@ def profile(request):
                 'post_count': post_count,
                 'cart_items': cart_items,
                 'comments': comments,
+                'comments_reply_post': comments_reply_post,
             }
             return render(request, 'autho/profile.html', context)
     else: 
@@ -428,7 +432,8 @@ def profile(request):
         p_form = ProfileUpdateForm(instance=profile)
 
     comments = Comment.objects.filter(product__author=request.user)
-
+    # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
+    comments_reply_post = Comment.objects.filter(parent__author=request.user)
     context = {
         'u_form': u_form,
         'p_form': p_form,
@@ -436,6 +441,7 @@ def profile(request):
         'post_count': post_count,
         'cart_items': cart_items,
         'comments': comments,
+        'comments_reply_post': comments_reply_post,
     }
     return render(request, 'autho/profile.html', context)
 
