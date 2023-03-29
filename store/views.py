@@ -22,7 +22,7 @@ from django.http import JsonResponse
 
 from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, 
                     UserUpdateForm, ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm)
-from .models import Post, Category, Profile, Comment, CartItem
+from .models import Post, Category, Profile, Comment, CartItem, Message
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -320,6 +320,22 @@ def post_detail(request, pk):
     }
     return render(request, 'service/post_detail.html', context)
 
+def private_messaging(request, pk):
+    post = get_object_or_404(Post, id=pk)
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            body = request.POST.get('body')
+            if body:
+                Message.objects.create(post=post, sender=request.user, recipient=post.author, body=body)
+    else:
+        body = None
+
+    return render(request, 'service/private_messaging.html')
+
+def messages_sent(request):
+    messages = Message.objects.filter(sender=request.user)
+    return render(request, 'service/messages_sent.html', {'messages': messages})
+
 def comment_delete(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     if request.method == 'POST' and request.user == comment.author:
@@ -334,6 +350,7 @@ def create_checkout_session(request, pk):
     ng = "http://127.0.0.1:8000/"
     if request.method == 'POST':
         stripe.api_key = settings.STRIPE_SECRET_KEY
+        quantity = int(request.POST.get('quantity', 1))
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
@@ -346,7 +363,7 @@ def create_checkout_session(request, pk):
                             'description': product.category,
                         },
                     },
-                    'quantity': 1,
+                    'quantity': quantity,
                 },
             ],
             mode='payment',
@@ -402,7 +419,7 @@ def profile(request):
     favorite_posts = CartItem.objects.filter(user=request.user).values_list('post', flat=True)
     cart_items = Post.objects.filter(id__in=favorite_posts)
     post_count = Post.objects.filter(author=request.user).count()
-
+    
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         profile, created = Profile.objects.get_or_create(user=request.user)  # If the switch is True, that means Django had to create a new Profile object for the user because it couldn't find an existing one
@@ -415,7 +432,7 @@ def profile(request):
             comments = Comment.objects.filter(product__author=request.user)
             # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
             comments_reply_post = Comment.objects.filter(parent__product__author=request.user)
-
+            p_messages = Message.objects.filter(sender=request.user)
             context = {
                 'u_form': u_form,
                 'p_form': p_form,
@@ -424,6 +441,7 @@ def profile(request):
                 'cart_items': cart_items,
                 'comments': comments,
                 'comments_reply_post': comments_reply_post,
+                'p_messages': p_messages,
             }
             return render(request, 'autho/profile.html', context)
     else: 
@@ -434,6 +452,7 @@ def profile(request):
     comments = Comment.objects.filter(product__author=request.user)
     # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
     comments_reply_post = Comment.objects.filter(parent__author=request.user)
+    p_messages = Message.objects.filter(sender=request.user)
     context = {
         'u_form': u_form,
         'p_form': p_form,
@@ -442,6 +461,7 @@ def profile(request):
         'cart_items': cart_items,
         'comments': comments,
         'comments_reply_post': comments_reply_post,
+        'p_messages': p_messages,
     }
     return render(request, 'autho/profile.html', context)
 

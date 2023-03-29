@@ -16,6 +16,7 @@ urlpatterns = [
     path('create_post/', views.create_post, name='create_post'),
     path('all_posts/', views.all_posts, name='all_posts'),
     path('post_detail/<int:pk>/', views.post_detail, name='post_detail'),
+    path('private_messaging/<int:pk>/', views.private_messaging, name='private_messaging'),
     path('posts/<int:pk>/like/', views.post_like, name='post_like'),
     path('posts/<int:pk>/dislike/', views.post_dislike, name='post_dislike'),
 

@@ -144,6 +144,9 @@
                                         </div>
                                     </div>
                                     {% endfor %}
+                                    {% for message in p_messages %}
+                                        <p>{{ message.body }}</p>
+                                    {% endfor %}
                                 </div>
                                 <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                                     {% for item in cart_items %}
@@ -211,28 +214,28 @@
                                 {% for item in cart_items %}
                                     <div class="card mb-3">
                                         <div class="row g-0">
-                                        <div class="col-md-4">
-                                            <center>
-                                                <img style="width: 60%; height: auto;" src="{{ item.image.url }}" class="img-fluid rounded-start" alt="servicio">
-                                            </center>
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="card-body">
-                                                <a href="{% url 'post_detail' item.pk %}">
-                                                    <div class="d-flex" style="justify-content: space-between">
-                                                        <h5 class="card-title">{{ item.title }}</h5>
-                                                        <a href="{% url 'category_list' item.category.pk %}">
-                                                            <p><span class="badge bg-warning text-dark">{{ item.category }}</span></p>
-                                                        </a>
-                                                    </div>
-                                                    <p class="card-text">{{ item.content|slice:'200' }}</p>
-                                                    <div class="d-flex" style="justify-content: space-between">
-                                                        <p class="card-text"><small class="text-muted">{{ item.created_at }}</small></p>
-                                                        <p class="card-text" style="color: green;"><small>${{ item.get_display_price }}</small></p>  
-                                                    </div>
-                                                </a>
+                                            <div class="col-md-4">
+                                                <center>
+                                                    <img style="width: 60%; height: auto;" src="{{ item.image.url }}" class="img-fluid rounded-start" alt="servicio">
+                                                </center>
                                             </div>
-                                        </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body">
+                                                    <a href="{% url 'post_detail' item.pk %}">
+                                                        <div class="d-flex" style="justify-content: space-between">
+                                                            <h5 class="card-title">{{ item.title }}</h5>
+                                                            <a href="{% url 'category_list' item.category.pk %}">
+                                                                <p><span class="badge bg-warning text-dark">{{ item.category }}</span></p>
+                                                            </a>
+                                                        </div>
+                                                        <p class="card-text">{{ item.content|slice:'200' }}</p>
+                                                        <div class="d-flex" style="justify-content: space-between">
+                                                            <p class="card-text"><small class="text-muted">{{ item.created_at }}</small></p>
+                                                            <p class="card-text" style="color: green;"><small>${{ item.get_display_price }}</small></p>  
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 {% empty %}

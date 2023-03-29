@@ -110,3 +110,20 @@ class Comment(models.Model):
 class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return str(self.user) + ' -> ' + str(self.post)
+
+class Message(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    body = models.TextField()
+
+    class Meta:
+        ordering = ('-timestamp',)
+
+    def __str__(self):
+        return str(self.sender) + ' --> ' + str(self.recipient) + ' --> ' + str(self.post.title)
+
