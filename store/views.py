@@ -433,6 +433,8 @@ def profile(request):
             # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
             comments_reply_post = Comment.objects.filter(parent__product__author=request.user)
             p_messages = Message.objects.filter(sender=request.user)
+            p_messagess = Message.objects.filter(recipient=request.user)
+
             context = {
                 'u_form': u_form,
                 'p_form': p_form,
@@ -442,6 +444,7 @@ def profile(request):
                 'comments': comments,
                 'comments_reply_post': comments_reply_post,
                 'p_messages': p_messages,
+                'p_messagess': p_messagess,
             }
             return render(request, 'autho/profile.html', context)
     else: 
@@ -453,6 +456,7 @@ def profile(request):
     # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
     comments_reply_post = Comment.objects.filter(parent__author=request.user)
     p_messages = Message.objects.filter(sender=request.user)
+    p_messagess = Message.objects.filter(recipient=request.user)
     context = {
         'u_form': u_form,
         'p_form': p_form,
@@ -462,6 +466,7 @@ def profile(request):
         'comments': comments,
         'comments_reply_post': comments_reply_post,
         'p_messages': p_messages,
+        'p_messagess': p_messagess,
     }
     return render(request, 'autho/profile.html', context)
 

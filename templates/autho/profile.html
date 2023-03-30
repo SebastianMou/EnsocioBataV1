@@ -3,7 +3,6 @@
 {% load humanize %}
 {% block content %}
 <style>
-
     h3 {
         font-size: 18px;
         font-weight: 500;
@@ -112,6 +111,7 @@
                                 <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Publicaciones</a>
                                 <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Favorito</a>
                                 <a class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" href="#nav-disabled" role="tab" aria-controls="nav-disabled" tabindex="-1">Commentarios</a>
+                                <a class="nav-link" id="nav-massages-tab" data-bs-toggle="tab" href="#nav-massages" role="tab" aria-controls="nav-massages" aria-selected="false">Mensajes</a>
                             </nav>
                               <div class="tab-content" id="nav-tabContent">
                                 <br>
@@ -143,9 +143,12 @@
                                         </div>
                                         </div>
                                     </div>
-                                    {% endfor %}
-                                    {% for message in p_messages %}
-                                        <p>{{ message.body }}</p>
+                                    {% empty %}
+                                        <center>
+                                            <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
+                                            <br><br>
+                                            <p>Aún no hay publicaciones.</p>
+                                        </center>
                                     {% endfor %}
                                 </div>
                                 <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
@@ -177,7 +180,11 @@
                                             </div>
                                         </div>
                                     {% empty %}
-                                        <p>Aún no hay publicaciones favoritas.</p>
+                                        <center>
+                                            <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
+                                            <br><br>
+                                            <p>Aún no hay commentarios.</p>
+                                        </center>
                                     {% endfor %}
                                 </div>
                                 <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab">
@@ -200,6 +207,25 @@
                                                 </a>
                                             </div>
                                         </div>
+                                    {% empty %}
+                                        <center>
+                                            <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
+                                            <br><br>
+                                            <p>Aún no hay commentarios.</p>
+                                        </center>
+                                    {% endfor %}
+                                </div>
+                                <div class="tab-pane fade" id="nav-massages" role="tabpanel" aria-labelledby="nav-massages-tab">
+                                    {% for message in p_messagess %}
+                                        <p>{{ message.post }}</p>
+                                        <p>{{ message.sender }} - {{ message.body }}</p>
+                                        <hr>
+                                    {% empty %}
+                                        <center>
+                                            <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
+                                            <br><br>
+                                            <p>Aún no hay mensajes.</p>
+                                        </center>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -207,6 +233,7 @@
                         <nav class="nav nav-tabs" id="nav-tab" role="tablist">
                             <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Favorito</a>
                             <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Commentarios</a>
+                            <a class="nav-link" id="nav-massages-tab" data-bs-toggle="tab" href="#nav-massages" role="tab" aria-controls="nav-massages" aria-selected="false">Mensajes</a>
                         </nav>
                         <div class="tab-content" id="nav-tabContent">
                             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
@@ -239,12 +266,16 @@
                                         </div>
                                     </div>
                                 {% empty %}
-                                    <p>Aún no hay publicaciones favoritas.</p>
+                                    <center>
+                                        <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
+                                        <br><br>
+                                        <p>Aún no hay favorito.</p>
+                                    </center>
                                 {% endfor %}
                             </div>
                             <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                <br>
                                 {% for comment in comments_reply_post %}
-                                    <br>
                                     <div class="card">
                                         <div class="card-body">
                                             <a href="{% url 'post_detail' comment.product.pk %}">
@@ -262,13 +293,32 @@
                                             </a>
                                         </div>
                                     </div>
+                                {% empty %}
+                                    <center>
+                                        <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
+                                        <br><br>
+                                        <p>Aún no hay commentarios.</p>
+                                    </center>
+                                {% endfor %}
+                            </div>
+                            <div class="tab-pane fade" id="nav-massages" role="tabpanel" aria-labelledby="nav-massages-tab">
+                                <br>
+                                {% for message in p_messages %}
+                                    <p>{{ message.post }}</p>
+                                    <p>{{ message.sender }} - {{ message.body }}</p>
+                                    <hr>
+                                {% empty %}
+                                    <center>
+                                        <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
+                                        <br><br>
+                                        <p>Aún no hay mensajes.</p>
+                                    </center>
                                 {% endfor %}
                             </div>
                         </div>
                         {% endif %}
                     </div>
                 </div>
-
                 <div class="col-lg-4">
                     <div class="cardz">
                         <div class="card_background_img"></div>
@@ -329,7 +379,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </section><!-- End Portfolio Details Section -->

@@ -315,7 +315,9 @@
               {% endif %}
             {% endif %}
           </div><!-- End sidebar recent posts-->
-          <a href="{% url 'private_messaging' product.pk %}" class="btn btn-primary">Message Seller</a>
+          <div class="sidebar">
+            <a href="{% url 'private_messaging' product.pk %}" class="btn btn-primary form-control">Mensaje al vendedor</a>
+          </div>
 
           <br><br>
           <h3>Productos Similares</h3>

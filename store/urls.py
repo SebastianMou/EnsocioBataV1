@@ -17,16 +17,16 @@ urlpatterns = [
     path('all_posts/', views.all_posts, name='all_posts'),
     path('post_detail/<int:pk>/', views.post_detail, name='post_detail'),
     path('private_messaging/<int:pk>/', views.private_messaging, name='private_messaging'),
+
     path('posts/<int:pk>/like/', views.post_like, name='post_like'),
     path('posts/<int:pk>/dislike/', views.post_dislike, name='post_dislike'),
-
     path('comment_delete/<int:pk>/', views.comment_delete, name='comment_delete'),
+    path('post/<int:post_id>/favorite/', views.favorite_view, name='post_favorite'),
+
     path('edit_post/<int:pk>/', views.edit_post, name='edit_post'),
     path('delete/<int:post_id>/', views.delete, name='delete'),
     path('search/', views.search, name='search'),
     path('category_list/<int:pk>', views.category_list, name='category_list'),
-
-    path('post/<int:post_id>/favorite/', views.favorite_view, name='post_favorite'),
 
     # Stripe Payment connection
     path('create_checkout_session/<int:pk>/', views.create_checkout_session, name='create_checkout_session'),
@@ -34,7 +34,6 @@ urlpatterns = [
     path('checkout_cancel/', views.checkout_cancel, name='checkout_cancel'),
     # activación de la cuenta de usuario por correo electrónico
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
-    # path('activate_buyer/<uidb64>/<token>', views.activate_buyer, name='activate_buyer'),
 
     # User change password from account 
     path('change_password/', login_required(auth_views.PasswordChangeView.as_view(template_name='authentication/password_change.html', success_url='/password_changed/')), name='password_change'),
