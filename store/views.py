@@ -322,6 +322,8 @@ def post_detail(request, pk):
 
 def private_messaging(request, pk):
     post = get_object_or_404(Post, id=pk)
+    messages = Message.objects.filter(post=post).order_by('timestamp')
+    conversations = Message.objects.filter(post=post, sender=request.user)
     if request.user.is_authenticated:
         if request.method == 'POST':
             body = request.POST.get('body')
@@ -329,12 +331,21 @@ def private_messaging(request, pk):
                 Message.objects.create(post=post, sender=request.user, recipient=post.author, body=body)
     else:
         body = None
-
-    return render(request, 'service/private_messaging.html')
+    context = {
+        'post': post,
+        'messages': messages,
+        'conversations': conversations,
+    }
+    return render(request, 'service/private_messaging.html', context)
 
 def messages_sent(request):
-    messages = Message.objects.filter(sender=request.user)
-    return render(request, 'service/messages_sent.html', {'messages': messages})
+    p_messages = Message.objects.filter(sender=request.user)
+    p_messagess = Message.objects.filter(recipient=request.user)    
+    context = {
+        'p_messages': p_messages,
+        'p_messagess': p_messagess,
+    }
+    return render(request, 'service/messages_sent.html', context)
 
 def comment_delete(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
