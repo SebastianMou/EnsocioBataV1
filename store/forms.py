@@ -2,10 +2,10 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from ckeditor.fields import RichTextField
 from django.forms.widgets import ClearableFileInput
 
 from .models import Account, Category, Post, Profile, Comment
+from ckeditor.fields import RichTextField
 
 class UserSellerRegisterForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={

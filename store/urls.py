@@ -12,11 +12,16 @@ urlpatterns = [
     path('user_logout/', views.user_logout, name='user_logout'),
     path('profile/', views.profile, name='profile'),
     path('visible_profile/<str:username>/', views.visible_profile, name='visible_profile'),
+
+    path('inbox/', views.inbox, name='inbox'),
+    path('directs/<str:username>/', views.directs, name='directs'),
+    path('send_message_ajax/', views.send_message_ajax, name='send_message_ajax'),
+    path('get_messages_ajax/<str:username>/', views.get_messages_ajax, name='get_messages_ajax'),
+    
     # Controlling post
     path('create_post/', views.create_post, name='create_post'),
     path('all_posts/', views.all_posts, name='all_posts'),
     path('post_detail/<int:pk>/', views.post_detail, name='post_detail'),
-    path('private_messaging/<int:pk>/', views.private_messaging, name='private_messaging'),
 
     path('posts/<int:pk>/like/', views.post_like, name='post_like'),
     path('posts/<int:pk>/dislike/', views.post_dislike, name='post_dislike'),

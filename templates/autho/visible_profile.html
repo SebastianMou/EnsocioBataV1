@@ -195,6 +195,9 @@
                             {% endif %}
                             <p>{{ user.profile.bio }}</p>
                             <hr>
+                            {% if show_chat_button %}
+                                <a class="btn btn-danger" href="{% url 'directs' user.username %}">chat</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

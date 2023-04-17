@@ -4,6 +4,7 @@ from ckeditor.fields import RichTextField
 from django.core.validators import FileExtensionValidator
 from PIL import Image
 from django.urls import reverse
+from django.db.models import Max
 
 # Create your models here.
 class Account(models.Model):
@@ -115,15 +116,49 @@ class CartItem(models.Model):
         return str(self.user) + ' -> ' + str(self.post)
 
 class Message(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user')
+    reciepient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user')
     body = models.TextField()
+    file = models.FileField(upload_to='uploads/', null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
 
-    class Meta:
-        ordering = ('-timestamp',)
+    def send_message(from_user, to_user, body, file=None):
+        sender_message = Message(
+            user=from_user,
+            sender=from_user,
+            reciepient=to_user,
+            body=body,
+            is_read=True,
+        )
 
-    def __str__(self):
-        return str(self.sender) + ' --> ' + str(self.recipient) + ' --> ' + str(self.post.title)
+        if file:
+            sender_message.file = file
 
+        sender_message.save()
+
+        recipient_message = Message(
+            user=to_user,
+            sender=from_user,
+            reciepient=from_user,
+            body=body,
+            is_read=False,
+        )
+
+        if file:
+            recipient_message.file = sender_message.file  # Use the file saved in the sender_message
+
+        recipient_message.save()
+        return sender_message
+    
+    def get_message(user):
+        users = []
+        messages = Message.objects.filter(user=user).values('reciepient').annotate(last=Max('date')).order_by('-last')
+        for message in messages:
+            users.append({
+                    'user': User.objects.get(pk=message['reciepient']),
+                    'last': message['last'],
+                    'unread': Message.objects.filter(user=user, reciepient__pk=message['reciepient'], is_read=False).count()
+                })
+        return users

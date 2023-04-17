@@ -16,7 +16,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
 from .tokens import account_activation_token
 
-import stripe
 from django.conf import settings
 from django.http import JsonResponse
 
@@ -24,6 +23,7 @@ from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm,
                     UserUpdateForm, ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm)
 from .models import Post, Category, Profile, Comment, CartItem, Message
 
+import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create your views here.
@@ -320,33 +320,6 @@ def post_detail(request, pk):
     }
     return render(request, 'service/post_detail.html', context)
 
-def private_messaging(request, pk):
-    post = get_object_or_404(Post, id=pk)
-    messages = Message.objects.filter(post=post).order_by('timestamp')
-    conversations = Message.objects.filter(post=post, sender=request.user)
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            body = request.POST.get('body')
-            if body:
-                Message.objects.create(post=post, sender=request.user, recipient=post.author, body=body)
-    else:
-        body = None
-    context = {
-        'post': post,
-        'messages': messages,
-        'conversations': conversations,
-    }
-    return render(request, 'service/private_messaging.html', context)
-
-def messages_sent(request):
-    p_messages = Message.objects.filter(sender=request.user)
-    p_messagess = Message.objects.filter(recipient=request.user)    
-    context = {
-        'p_messages': p_messages,
-        'p_messagess': p_messagess,
-    }
-    return render(request, 'service/messages_sent.html', context)
-
 def comment_delete(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     if request.method == 'POST' and request.user == comment.author:
@@ -443,9 +416,7 @@ def profile(request):
             comments = Comment.objects.filter(product__author=request.user)
             # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
             comments_reply_post = Comment.objects.filter(parent__product__author=request.user)
-            p_messages = Message.objects.filter(sender=request.user)
-            p_messagess = Message.objects.filter(recipient=request.user)
-
+            
             context = {
                 'u_form': u_form,
                 'p_form': p_form,
@@ -454,8 +425,6 @@ def profile(request):
                 'cart_items': cart_items,
                 'comments': comments,
                 'comments_reply_post': comments_reply_post,
-                'p_messages': p_messages,
-                'p_messagess': p_messagess,
             }
             return render(request, 'autho/profile.html', context)
     else: 
@@ -466,8 +435,6 @@ def profile(request):
     comments = Comment.objects.filter(product__author=request.user)
     # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
     comments_reply_post = Comment.objects.filter(parent__author=request.user)
-    p_messages = Message.objects.filter(sender=request.user)
-    p_messagess = Message.objects.filter(recipient=request.user)
     context = {
         'u_form': u_form,
         'p_form': p_form,
@@ -476,8 +443,6 @@ def profile(request):
         'cart_items': cart_items,
         'comments': comments,
         'comments_reply_post': comments_reply_post,
-        'p_messages': p_messages,
-        'p_messagess': p_messagess,
     }
     return render(request, 'autho/profile.html', context)
 
@@ -494,6 +459,10 @@ def visible_profile(request, username):
     post_count = Post.objects.filter(author=user).count()
     last_login = user.last_login
     current_time = timezone.now()
+    if request.user == user:
+        show_chat_button = False
+    else:
+        show_chat_button = True
     if current_time - last_login < timezone.timedelta(minutes=5):
         is_active = True
     else:
@@ -503,5 +472,85 @@ def visible_profile(request, username):
         'posts': posts,
         'post_count': post_count,
         'is_active': is_active,
+        'show_chat_button': show_chat_button,
     }
     return render(request, 'autho/visible_profile.html', context)
+
+@login_required
+def inbox(request):
+    user = request.user
+    messages = Message.get_message(user=user)
+    active_direct = None
+    directs = None
+
+    if messages:
+        message = messages[0]
+        active_direct = message['user'].username
+        directs = Message.objects.filter(user=user, reciepient=message['user'])
+        directs.update(is_read=True)
+
+        for message in messages:
+            if message['user'].username == active_direct:
+                message['unread'] = 0
+
+    context = {
+        'directs': directs,
+        'active_direct': active_direct,
+        'messages': messages,
+    }
+    return render(request, 'autho/inbox.html', context)
+
+@login_required
+def directs(request, username):
+    sending_message_to = get_object_or_404(User, username=username)
+    user = request.user
+    messages = Message.get_message(user=user)
+    active_direct = username
+    directs = Message.objects.filter(user=user, reciepient__username=username)
+    directs.update(is_read=True)
+    
+    for message in messages:
+        if message['user'].username == username:
+            message['unread'] = 0
+
+    context = {
+        'sending_message_to': sending_message_to,
+        'directs': directs,
+        'active_direct': active_direct,
+        'messages': messages,
+    }
+    return render(request, 'autho/directs.html', context)
+
+def send_message_ajax(request):
+    if request.method == 'POST':
+        from_user = request.user
+        to_user_username = request.POST.get('to_user')
+        body = request.POST.get('body')
+        file = request.FILES.get('file')
+
+        to_user = User.objects.get(username=to_user_username)
+        Message.send_message(from_user, to_user, body, file)
+
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'failed'})
+
+def get_messages_ajax(request, username):
+    user = request.user
+    sending_message_to = get_object_or_404(User, username=username)
+    directs = Message.objects.filter(user=user, reciepient__username=username)
+    directs.update(is_read=True)
+
+    messages = []
+    for direct in directs:
+        message_data = {
+            'sender': direct.sender.username,
+            'body': direct.body,
+            'date': direct.date.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+        if direct.file:
+            message_data['file_url'] = direct.file.url
+        messages.append(message_data)
+
+    # print(messages)  # Add this line to print messages data
+    return JsonResponse({'messages': messages})
