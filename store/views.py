@@ -332,7 +332,7 @@ def comment_delete(request, pk):
 
 def create_checkout_session(request, pk):
     product = get_object_or_404(Post, pk=pk)
-    ng = "https://ensocio.herokuapp.com/"
+    ng = "https://ensocio.herokuapp.com"
     if request.method == 'POST':
         stripe.api_key = settings.STRIPE_SECRET_KEY
         quantity = int(request.POST.get('quantity', 1))
