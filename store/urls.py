@@ -18,6 +18,9 @@ urlpatterns = [
     path('send_message_ajax/', views.send_message_ajax, name='send_message_ajax'),
     path('get_messages_ajax/<str:username>/', views.get_messages_ajax, name='get_messages_ajax'),
     
+    path('stripe_webhook/', views.stripe_webhook, name='stripe_webhook'),
+    path('transactions/', views.transaction_list, name='transaction_list'),
+
     # Controlling post
     path('create_post/', views.create_post, name='create_post'),
     path('all_posts/', views.all_posts, name='all_posts'),

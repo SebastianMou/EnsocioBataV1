@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.urls import reverse
 from django.db.models import Q
 from django.contrib.auth.models import User
@@ -17,13 +17,14 @@ from django.core.mail import EmailMessage
 from .tokens import account_activation_token
 
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 
 from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, 
                     UserUpdateForm, ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm)
-from .models import Post, Category, Profile, Comment, CartItem, Message
+from .models import Post, Category, Profile, Comment, CartItem, Message, Transaction
 
 import stripe
+import logging
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Create your views here.
@@ -335,6 +336,7 @@ def create_checkout_session(request, pk):
     if request.method == 'POST':
         stripe.api_key = settings.STRIPE_SECRET_KEY
         quantity = int(request.POST.get('quantity', 1))
+        name = f"{product.author} - {product.title}"
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
@@ -343,7 +345,7 @@ def create_checkout_session(request, pk):
                         'currency': 'mxn',
                         'unit_amount': product.price,
                         'product_data': {
-                            'name': product.title,
+                            'name': name,
                             'description': product.category,
                         },
                     },
@@ -353,6 +355,12 @@ def create_checkout_session(request, pk):
             mode='payment',
             success_url=ng + '/checkout_success',
             cancel_url=ng + '/checkout_cancel',
+            metadata={
+                'post_id': product.id,
+                'seller_id': product.author.id,
+                'buyer_id': request.user.id,
+                'quantity': quantity,
+            },
         )
         return redirect(checkout_session.url)
     else:
@@ -375,6 +383,58 @@ def post_dislike(request, pk):
         post.dislikes.add(request.user)
         post.likes.remove(request.user)
     return redirect('post_detail', pk=post.id)
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def stripe_webhook(request):
+    if "HTTP_STRIPE_SIGNATURE" not in request.META:
+        logger.error(f"Missing Stripe signature. Headers: {request.META}")
+        return HttpResponseBadRequest("Missing Stripe signature")
+
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError as e:
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e:
+        return HttpResponse(status=400)
+
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        post_id = session['metadata']['post_id']
+        seller_id = session['metadata']['seller_id']
+        buyer_id = session['metadata']['buyer_id']
+        quantity = session['metadata']['quantity']
+
+        post = Post.objects.get(id=post_id)
+        seller = User.objects.get(id=seller_id)
+        buyer = User.objects.get(id=buyer_id)
+
+        transaction = Transaction(
+            buyer=buyer,
+            seller=seller,
+            post=post,
+            quantity=quantity,
+            amount=session['amount_total']
+        )
+        transaction.save()
+        logger.info(f"Transaction saved: {transaction}")
+
+    else:
+        logger.warning(f"Received an unhandled event: {event}")
+
+    return HttpResponse(status=200)
+
+@login_required
+def transaction_list(request):
+    transactions = Transaction.objects.all().order_by('-created_at')
+    return render(request, 'transactions/list.html', {'transactions': transactions})
 
 def checkout_success(request):
     return render(request, 'checkout_success.html')

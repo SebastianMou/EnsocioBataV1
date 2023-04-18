@@ -95,6 +95,18 @@ class Post(models.Model):
     def get_display_price(self):
         return "{0:.2f}".format(self.price / 100)
 
+class Transaction(models.Model):
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='purchases')
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    amount = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.buyer.username} purchased {self.quantity} of {self.post.title} from {self.seller.username}"
+
+
 class Comment(models.Model):
     product = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
