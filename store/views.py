@@ -388,6 +388,7 @@ logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def stripe_webhook(request):
+    print("Webhook called")
     if "HTTP_STRIPE_SIGNATURE" not in request.META:
         logger.error(f"Missing Stripe signature. Headers: {request.META}")
         return HttpResponseBadRequest("Missing Stripe signature")
@@ -405,7 +406,10 @@ def stripe_webhook(request):
     except stripe.error.SignatureVerificationError as e:
         return HttpResponse(status=400)
 
+    print(f"Event: {event}")
+
     if event['type'] == 'checkout.session.completed':
+        print("Handling checkout.session.completed event")
         session = event['data']['object']
         post_id = session['metadata']['post_id']
         seller_id = session['metadata']['seller_id']
@@ -424,12 +428,14 @@ def stripe_webhook(request):
             amount=session['amount_total']
         )
         transaction.save()
+        print(f"Transaction saved: {transaction}")
         logger.info(f"Transaction saved: {transaction}")
 
     else:
         logger.warning(f"Received an unhandled event: {event}")
 
     return HttpResponse(status=200)
+
 
 @login_required
 def transaction_list(request):
