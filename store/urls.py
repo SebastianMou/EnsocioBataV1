@@ -5,11 +5,12 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('seller_register/SVZOMGHDICY27X5-YWB5LZF2O3KXPSI-KI45BDEYRSQ0LFT-ELOWF93S846ATVQ/', views.seller_register, name='seller_register'),
-    path('buyer_register/', views.buyer_register, name='buyer_register'),
+    path('inicio/', views.home_front, name='home_front'),
     path('user_login/', views.user_login, name='user_login'),
-    path('delete_account/', views.delete_account, name='delete_account'),
+    path('buyer_register/', views.buyer_register, name='buyer_register'),
+    path('seller_register/SVZOMGHDICY27X5-YWB5LZF2O3KXPSI-KI45BDEYRSQ0LFT-ELOWF93S846ATVQ/', views.seller_register, name='seller_register'),
     path('user_logout/', views.user_logout, name='user_logout'),
+    path('delete_account/', views.delete_account, name='delete_account'),
     path('profile/', views.profile, name='profile'),
     path('visible_profile/<str:username>/', views.visible_profile, name='visible_profile'),
 

@@ -73,7 +73,7 @@
     }
 
     .btn {
-        padding: 13px;
+        padding: 10px;
         width: 100%;
         border: none;
         outline: none;
@@ -111,7 +111,6 @@
                                 <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Publicaciones</a>
                                 <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Favorito</a>
                                 <a class="nav-link" id="nav-disabled-tab" data-bs-toggle="tab" href="#nav-disabled" role="tab" aria-controls="nav-disabled" tabindex="-1">Commentarios</a>
-                                <a class="nav-link" id="nav-massages-tab" data-bs-toggle="tab" href="#nav-massages" role="tab" aria-controls="nav-massages" aria-selected="false">Mensajes</a>
                             </nav>
                               <div class="tab-content" id="nav-tabContent">
                                 <br>
@@ -215,25 +214,11 @@
                                         </center>
                                     {% endfor %}
                                 </div>
-                                <div class="tab-pane fade" id="nav-massages" role="tabpanel" aria-labelledby="nav-massages-tab">
-                                    {% for message in p_messagess %}
-                                        <p>{{ message.post }}</p>
-                                        <p>{{ message.sender }} - {{ message.body }}</p>
-                                        <hr>
-                                    {% empty %}
-                                        <center>
-                                            <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
-                                            <br><br>
-                                            <p>Aún no hay mensajes.</p>
-                                        </center>
-                                    {% endfor %}
-                                </div>
                             </div>
                         {% else %}
                         <nav class="nav nav-tabs" id="nav-tab" role="tablist">
                             <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Favorito</a>
                             <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Commentarios</a>
-                            <a class="nav-link" id="nav-massages-tab" data-bs-toggle="tab" href="#nav-massages" role="tab" aria-controls="nav-massages" aria-selected="false">Mensajes</a>
                         </nav>
                         <div class="tab-content" id="nav-tabContent">
                             <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
@@ -301,20 +286,6 @@
                                     </center>
                                 {% endfor %}
                             </div>
-                            <div class="tab-pane fade" id="nav-massages" role="tabpanel" aria-labelledby="nav-massages-tab">
-                                <br>
-                                {% for message in p_messages %}
-                                    <p>{{ message.post }}</p>
-                                    <p>{{ message.sender }} - {{ message.body }}</p>
-                                    <hr>
-                                {% empty %}
-                                    <center>
-                                        <img style="width: 180px; height: auto;" class="img-fluid" src="{% static 'assets/img/sad.png' %}" alt="" srcset="">
-                                        <br><br>
-                                        <p>Aún no hay mensajes.</p>
-                                    </center>
-                                {% endfor %}
-                            </div>
                         </div>
                         {% endif %}
                     </div>
@@ -372,14 +343,12 @@
                                 <button type="button" class="btn btn-primary mr-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                                     Actualizar
                                 </button>
-                                <a href="{% url 'delete_account' %}" type="button" class="btn btn-danger form-control">
-                                    Borrar
+                                <a href="{% url 'inbox' %}" type="button" class="btn btn-primary form-control">
+                                    <i class="bi bi-inbox"></i> Inbox
                                 </a>
                             </div>
                             <br>
-                            <a href="{% url 'inbox' %}" type="button" class="btn btn-primary form-control">
-                                <i class="bi bi-inbox"></i> Inbox
-                            </a>
+                            
                         </div>
                     </div>
                 </div>

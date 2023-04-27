@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -57,6 +58,35 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
+def home_front(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        subject = request.POST.get('subject')
+        name = request.POST.get('name')
+        data = {
+            'complaint': 'ENSOCIO.MX',
+            'name': name,
+            'subject': subject,
+            'email': email,
+            'message': message, 
+        }
+        message = '''
+        From: {}
+        Email: {}
+        New message: {}
+        '''.format(data['name'], data['email'], data['message'])
+        send_mail(data['complaint'], message, '', ['ensocio.mx@gmail.com'])
+
+    categories = Category.objects.filter(
+        Q(name__startswith='Servicios de voz') | Q(name__startswith='Diseño gráfico') |
+        Q(name__startswith='Servicios de SEO')
+    )[:3]
+    context = {
+        'categories': categories,
+    }
+    return render(request, 'home_front.html', context)
+
 def category_list(request, pk):
     if request.method == 'POST':
         query = request.POST.get('search')
@@ -64,7 +94,12 @@ def category_list(request, pk):
 
         categories = Category.objects.all()
         category = get_object_or_404(Category, pk=pk)
-        posts = Post.objects.filter(category=category)
+
+        posts_list = Post.objects.filter(category=category)
+        paginator = Paginator(posts_list, 50)
+        page_number = request.GET.get("page")
+        posts = paginator.get_page(page_number)
+
         context = {
             'categories': categories,
             'category': category,
@@ -75,7 +110,10 @@ def category_list(request, pk):
     else:
         categories = Category.objects.all()
         category = get_object_or_404(Category, pk=pk)
-        posts = Post.objects.filter(category=category)
+        posts_list = Post.objects.filter(category=category)
+        paginator = Paginator(posts_list, 50)
+        page_number = request.GET.get("page")
+        posts = paginator.get_page(page_number)
         context = {
             'categories': categories,
             'category': category,
@@ -103,12 +141,12 @@ def delete_account(request):
     if request.method == 'POST':
         request.user.delete()
         messages.success(request, 'Your account has been deleted.')
-        return redirect('home')
+        return redirect('home_front')
     return render(request, 'autho/delete_account.html')
 
 def user_logout(request):
     logout(request)
-    return redirect('/')
+    return redirect('home_front')
 
 def activate(request, uidb64, token):
     User = get_user_model()
@@ -159,7 +197,7 @@ def seller_register(request):
                 user.is_active = False
                 user.save()
                 activateEmail(request, user, form.cleaned_data.get('email'))
-                return redirect('/')
+                return redirect('home_front')
     else:
         form = UserSellerRegisterForm()
     context = {
@@ -215,7 +253,7 @@ def buyer_register(request):
                 user.is_active = False
                 user.save()
                 activateEmail_buyer(request, user, form.cleaned_data.get('email'))
-                return redirect('/')
+                return redirect('home_front')
     else:
         form = UserBuyerRegisterForm()
     context = {
@@ -245,7 +283,7 @@ def edit_post(request, pk):
     post = get_object_or_404(Post, id=pk)
 
     if post.author != request.user:
-        return redirect('/')
+        return redirect('home_front')
 
     if request.method == 'POST':
         form = UpdatePostForm(request.POST, request.FILES, instance=post)
@@ -263,13 +301,21 @@ def edit_post(request, pk):
 def delete(request, post_id=None):
     post = Post.objects.get(id=post_id)
     if post.author != request.user:
-        return redirect('/')
+        return redirect('home_front')
     post.delete()
     return redirect('profile')
 
 def all_posts(request):
-    posts = Post.objects.all()
-    categories = Category.objects.all()
+    posts_list = Post.objects.all()
+    paginator = Paginator(posts_list, 50)
+    page_number = request.GET.get("page")
+    posts = paginator.get_page(page_number)
+
+    categories_list = Category.objects.all()
+    paginator_category = Paginator(categories_list, 70)
+    page_number = request.GET.get("page")
+    categories = paginator_category.get_page(page_number)
+
     context = {
         'posts': posts,
         'categories': categories,
@@ -278,7 +324,10 @@ def all_posts(request):
 
 def post_detail(request, pk):
     product = get_object_or_404(Post, pk=pk)
-    comments = product.comment_set.filter(parent__isnull=True)
+    comments_list = product.comment_set.filter(parent__isnull=True)
+    paginator = Paginator(comments_list, 50)
+    page_number = request.GET.get("page")
+    comments = paginator.get_page(page_number)
     cout_reviews = Comment.objects.filter(product=product).count()
     # current_url = request.build_absolute_uri()
     related_products = product.related_products()
@@ -436,7 +485,6 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
-
 @login_required
 def transaction_list(request):
     transactions = Transaction.objects.all().order_by('-created_at')
@@ -451,8 +499,17 @@ def checkout_cancel(request):
 def search(request):
     if request.method == 'POST':
         query = request.POST.get('search')
-        results = Post.objects.filter(title__icontains=query)
-        results_c = Category.objects.filter(name__icontains=query)
+
+        results_list = Post.objects.filter(title__icontains=query)
+        paginator = Paginator(results_list, 50)
+        page_number = request.GET.get("page")
+        results = paginator.get_page(page_number)
+
+        results_c_list = Category.objects.filter(name__icontains=query)
+        paginator_c = Paginator(results_c_list, 50)
+        page_number_c = request.GET.get("page")
+        results_c = paginator_c.get_page(page_number_c)
+
         context = {
             'results': results,
             'query': query,

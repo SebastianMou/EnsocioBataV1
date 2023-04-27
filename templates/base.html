@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -37,26 +36,29 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 </head>
-
 <body>
 
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top">
         <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-            <a href="/" class="logo d-flex align-items-center">
+            <a href="{% url 'home_front' %}" class="logo d-flex align-items-center">
                 <img src="{% static 'assets/img/logo.png' %}" alt="">
                 <span>Ensocio</span>
             </a>
 
             <nav id="navbar" class="navbar">
                 <ul>
-                    <li><a class="nav-link scrollto " href="#hero">Home</a></li>
-                    <li><a class="nav-link scrollto" href="#about">About</a></li>
-                    <li><a class="nav-link scrollto" href="#services">Services</a></li>
-                    <li><a class="nav-link scrollto" href="#portfolio">Portfolio</a></li>
-                    <li><a class="nav-link scrollto" href="#team">Team</a></li>
-                    <li><a href="blog.html">Blog</a></li>
+                    <li>
+                        <form action="{% url 'search' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="d-flex">
+                                <input style="width: 22rem;" name="search" type="text" class="form-control" placeholder="Busca un Servicio">
+                                <button style="width: 40px;" value="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                            </div>
+                        </form>
+                    </li>
+                    <li><a class="nav-link scrollto" href="{% url 'all_posts' %}">Servicios</a></li>
                     <li class="dropdown"><a href="#"><span>Cuenta</span> <i class="bi bi-chevron-down"></i></a>
                         <ul>
                             {% if user.is_authenticated %}
@@ -75,6 +77,8 @@
                                 </ul>
                             </li> -->
                             <li><a href="{% url 'inbox' %}">Inbox</a></li>
+                            <li><a href="{% url 'delete_account' %}">Borrar cuenta</a></li>
+                            <li><a href="{% url 'password_change' %}">Cambiar contraseña</a></li>
                         </ul>
                     </li>
                     {% if user.is_authenticated %}
@@ -165,8 +169,7 @@
         </div>
     </footer><!-- End Footer -->
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
     <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
@@ -180,5 +183,4 @@
     <!-- Template Main JS File -->
     <script src="{% static 'assets/js/main.js' %}"></script>
 </body>
-
 </html>

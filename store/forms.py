@@ -18,7 +18,7 @@ class UserSellerRegisterForm(UserCreationForm):
     }))
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Nombre de usuario',
+        'placeholder': 'Nombre de Usuario',
     }))
     freelancer_key = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
@@ -26,7 +26,7 @@ class UserSellerRegisterForm(UserCreationForm):
     }))
     email = forms.EmailField(required=True, widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Correo electrónico'
+        'placeholder': 'Correo Electrónico'
     }))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
@@ -34,7 +34,7 @@ class UserSellerRegisterForm(UserCreationForm):
     }))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Confirmar contraseña',
+        'placeholder': 'Confirmar Contraseña',
     }))
 
     class Meta:
@@ -57,27 +57,27 @@ class UserSellerRegisterForm(UserCreationForm):
 class UserBuyerRegisterForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'First Name',
+        'placeholder': 'Nombre',
     }))
     last_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Last Name',
+        'placeholder': 'Apellido',
     }))
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Username',
+        'placeholder': 'Nombre de Usuario',
     }))
     email = forms.EmailField(required=True, widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Email'
+        'placeholder': 'Correo Electrónico'
     }))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'contraseña',
+        'placeholder': 'Contraseña',
     }))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
-        'placeholder': 'Confirmar contraseña',
+        'placeholder': 'Confirmar Contraseña',
     }))
 
     class Meta:
@@ -146,19 +146,19 @@ class PostForm(forms.ModelForm):
 class UserUpdateForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'First Name',
+        'placeholder': 'Nombre',
     }))
     last_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Last Name',
+        'placeholder': 'Apellido',
     }))
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'Username',
+        'placeholder': 'Nombre de Usuario',
     }))
     email = forms.EmailField(required=True, widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'email'
+        'placeholder': 'Correo Electrónico'
     }))
     class Meta:
         model = User
@@ -170,7 +170,7 @@ class ProfileUpdateForm(forms.ModelForm):
     }), required=False)
     bio = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
-        'placeholder': 'bio',
+        'placeholder': 'Bio',
         'rows': 5,
         'cols': 40,
     }))
@@ -205,11 +205,11 @@ class UpdatePostForm(forms.ModelForm):
     }))
     title = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control', 
-        'placeholder': 'title',
+        'placeholder': 'Título',
     }))
     content = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
-        'placeholder': 'content',
+        'placeholder': 'Contenido',
         'rows': 5,
         'cols': 40,
     }))
@@ -245,7 +245,7 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'text': forms.Textarea(attrs={
                 'class': 'form-control', 
-                'placeholder': 'Enter your review here...',
+                'placeholder': 'Ingrese su reseña aquí...',
                 'rows': 4,
                 'cols': 50
             }),
@@ -259,7 +259,7 @@ class ReplyForm(forms.ModelForm):
             'text': forms.Textarea(attrs={
                 'class': 'form-control', 
                 'id': 'reply-input',
-                'placeholder': 'Enter your review here...',
+                'placeholder': 'Ingrese su reseña aquí...',
                 'rows': 1,
             }),
         }

@@ -310,9 +310,41 @@
                                 </div>
                             </div>
                         </div>
+                        {% empty %}
+                        <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                            <div class="text-center">
+                                <img style="width: 50%; height: auto;" src="{%  static '/assets/img/Search_not_fount.png' %}" alt="asd" srcset="">
+                                <h6>Aún no hay publicaciones</h6>
+                            </div>
+                        </div>
                         {% endfor %}
+                        
                     </div>
                 </div>
+                página {{ posts.number }} / {{ posts.paginator.num_pages }}
+                <!-- Pagination-->
+                <nav aria-label="Pagination">
+                    <hr class="my-0" />
+                    <ul class="pagination justify-content-center my-4">
+                        <!--<li class="page-item"><a class="page-link" href="?page=1">&laquo first</a></li>-->
+                        {% if posts.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}">previous</a></li>
+                        {% endif %}
+                
+                        {% for num_page in posts.paginator.page_range %}
+                            {% if posts.number == num_page %}
+                                <li class="page-item active"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                
+                        {% if posts.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">next</a></li>
+                        {% endif %}
+                    </ul>
+                    <br>
+                </nav>
             </div>
             <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <br>
@@ -336,6 +368,30 @@
                         {% endfor %}
                     </div>
                 </center>
+                página {{ categories.number }} / {{ categories.paginator.num_pages }}
+                <!-- Pagination-->
+                <nav aria-label="Pagination">
+                    <hr class="my-0" />
+                    <ul class="pagination justify-content-center my-4">
+                        <!--<li class="page-item"><a class="page-link" href="?page=1">&laquo first</a></li>-->
+                        {% if categories.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page={{ categories.previous_page_number }}"><<</a></li>
+                        {% endif %}
+                
+                        {% for num_page in categories.paginator.page_range %}
+                            {% if categories.number == num_page %}
+                                <li class="page-item active"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                
+                        {% if categories.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ categories.next_page_number }}">>></a></li>
+                        {% endif %}
+                    </ul>
+                    <br>
+                </nav>
             </div>
             <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab">Lorem ipsum
                 dolor sit amet consectetur, adipisicing elit. Laudantium minima repellat incidunt facilis obcaecati
@@ -344,5 +400,6 @@
                 totam veniam esse in.</div>
         </div>
     </div>
+    
 </section>
 {% endblock %}
