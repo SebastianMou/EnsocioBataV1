@@ -149,6 +149,30 @@
                                             <p>Aún no hay publicaciones.</p>
                                         </center>
                                     {% endfor %}
+                                    página {{ posts.number }} / {{ posts.paginator.num_pages }}
+                                    <!-- Pagination-->
+                                    <nav aria-label="Pagination">
+                                        <hr class="my-0" />
+                                        <ul class="pagination justify-content-center my-4">
+                                            <!--<li class="page-item"><a class="page-link" href="?page=1">&laquo first</a></li>-->
+                                            {% if posts.has_previous %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ posts.previous_page_number }}"><<</a></li>
+                                            {% endif %}
+                                    
+                                            {% for num_page in posts.paginator.page_range %}
+                                                {% if posts.number == num_page %}
+                                                    <li class="page-item active"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                                {% else %}
+                                                    <li class="page-item"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                    
+                                            {% if posts.has_next %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ posts.next_page_number }}">>></a></li>
+                                            {% endif %}
+                                        </ul>
+                                        <br>
+                                    </nav>
                                 </div>
                                 <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                                     {% for item in cart_items %}
@@ -185,6 +209,30 @@
                                             <p>Aún no hay commentarios.</p>
                                         </center>
                                     {% endfor %}
+                                    página {{ cart_items.number }} / {{ cart_items.paginator.num_pages }}
+                                    <!-- Pagination-->
+                                    <nav aria-label="Pagination">
+                                        <hr class="my-0" />
+                                        <ul class="pagination justify-content-center my-4">
+                                            <!--<li class="page-item"><a class="page-link" href="?page=1">&laquo first</a></li>-->
+                                            {% if cart_items.has_previous %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ cart_items.previous_page_number }}"><<</a></li>
+                                            {% endif %}
+                                    
+                                            {% for num_page in cart_items.paginator.page_range %}
+                                                {% if cart_items.number == num_page %}
+                                                    <li class="page-item active"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                                {% else %}
+                                                    <li class="page-item"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                    
+                                            {% if cart_items.has_next %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ cart_items.next_page_number }}">>></a></li>
+                                            {% endif %}
+                                        </ul>
+                                        <br>
+                                    </nav>
                                 </div>
                                 <div class="tab-pane fade" id="nav-disabled" role="tabpanel" aria-labelledby="nav-disabled-tab">
                                     {% for x in comments %}
@@ -213,6 +261,32 @@
                                             <p>Aún no hay commentarios.</p>
                                         </center>
                                     {% endfor %}
+
+                                    página {{ comments.number }} / {{ comments.paginator.num_pages }}
+                                    <!-- Pagination-->
+                                    <nav aria-label="Pagination">
+                                        <hr class="my-0" />
+                                        <ul class="pagination justify-content-center my-4">
+                                            <!--<li class="page-item"><a class="page-link" href="?page=1">&laquo first</a></li>-->
+                                            {% if comments.has_previous %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ comments.previous_page_number }}"><<</a></li>
+                                            {% endif %}
+                                    
+                                            {% for num_page in comments.paginator.page_range %}
+                                                {% if comments.number == num_page %}
+                                                    <li class="page-item active"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                                {% else %}
+                                                    <li class="page-item"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                                {% endif %}
+                                            {% endfor %}
+                                    
+                                            {% if comments.has_next %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ comments.next_page_number }}">>></a></li>
+                                            {% endif %}
+                                        </ul>
+                                        <br>
+                                    </nav>
+
                                 </div>
                             </div>
                         {% else %}
@@ -257,6 +331,30 @@
                                         <p>Aún no hay favorito.</p>
                                     </center>
                                 {% endfor %}
+                                página {{ cart_items.number }} / {{ cart_items.paginator.num_pages }}
+                                <!-- Pagination-->
+                                <nav aria-label="Pagination">
+                                    <hr class="my-0" />
+                                    <ul class="pagination justify-content-center my-4">
+                                        <!--<li class="page-item"><a class="page-link" href="?page=1">&laquo first</a></li>-->
+                                        {% if cart_items.has_previous %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ cart_items.previous_page_number }}"><<</a></li>
+                                        {% endif %}
+                                
+                                        {% for num_page in cart_items.paginator.page_range %}
+                                            {% if cart_items.number == num_page %}
+                                                <li class="page-item active"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                
+                                        {% if cart_items.has_next %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ cart_items.next_page_number }}">>></a></li>
+                                        {% endif %}
+                                    </ul>
+                                    <br>
+                                </nav>
                             </div>
                             <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                                 <br>
@@ -285,6 +383,30 @@
                                         <p>Aún no hay commentarios.</p>
                                     </center>
                                 {% endfor %}
+                                página {{ comments_reply_post.number }} / {{ comments_reply_post.paginator.num_pages }}
+                                <!-- Pagination-->
+                                <nav aria-label="Pagination">
+                                    <hr class="my-0" />
+                                    <ul class="pagination justify-content-center my-4">
+                                        <!--<li class="page-item"><a class="page-link" href="?page=1">&laquo first</a></li>-->
+                                        {% if comments_reply_post.has_previous %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ comments_reply_post.previous_page_number }}"><<</a></li>
+                                        {% endif %}
+                                
+                                        {% for num_page in comments_reply_post.paginator.page_range %}
+                                            {% if comments_reply_post.number == num_page %}
+                                                <li class="page-item active"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                            {% else %}
+                                                <li class="page-item"><a class="page-link" href="?page={{ num_page }}">{{ num_page }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                
+                                        {% if comments_reply_post.has_next %}
+                                            <li class="page-item"><a class="page-link" href="?page={{ comments_reply_post.next_page_number }}">>></a></li>
+                                        {% endif %}
+                                    </ul>
+                                    <br>
+                                </nav>
                             </div>
                         </div>
                         {% endif %}
@@ -357,7 +479,7 @@
     </section><!-- End Portfolio Details Section -->
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="staticBackdropLabel">Actualizar</h5>
@@ -368,17 +490,17 @@
                 {% csrf_token %}
                 {{ u_form.as_p }}
                 {{ p_form.as_p }}
-                <a href="{% url 'password_change' %}">change password</a>
+                <a class="btn btn-primary" href="{% url 'password_change' %}">Cambiar la Contraseña</a>
                 <hr>
                 <center>
                     <img style="width: 56%; height: auto;" src="{{ user.profile.user_image.url }}" alt="" srcset="">
                 </center>
                 <hr>
-                <input type="submit" class="btn btn-primary form-control" value="Update">
+                <input type="submit" class="btn btn-primary form-control" value="Actualizar">
             </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerca</button>
         </div>
       </div>
     </div>

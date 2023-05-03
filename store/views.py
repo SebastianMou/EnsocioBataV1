@@ -20,8 +20,8 @@ from .tokens import account_activation_token
 from django.conf import settings
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 
-from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, 
-                    UserUpdateForm, ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm)
+from .forms import (UserSellerRegisterForm, UserBuyerRegisterForm, PostForm, UserUpdateForm, 
+                    ProfileUpdateForm, UpdatePostForm, CommentForm, ReplyForm, PasswordConfirmationForm)
 from .models import Post, Category, Profile, Comment, CartItem, Message, Transaction
 
 import stripe
@@ -139,10 +139,21 @@ def user_login(request):
 @login_required
 def delete_account(request):
     if request.method == 'POST':
-        request.user.delete()
-        messages.success(request, 'Your account has been deleted.')
-        return redirect('home_front')
-    return render(request, 'autho/delete_account.html')
+        form = PasswordConfirmationForm(request.POST)
+        if form.is_valid():
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=request.user.username, password=password)
+            if user is not None:
+                request.user.delete()
+                messages.success(request, 'Your account has been deleted.')
+                return redirect('home_front')
+            else:
+                messages.error(request, 'Incorrect password. Please try again.')
+    else:
+        form = PasswordConfirmationForm()
+
+    return render(request, 'autho/delete_account.html', {'form': form})
+
 
 def user_logout(request):
     logout(request)
@@ -521,10 +532,17 @@ def search(request):
 
 @login_required
 def profile(request):
-    posts = Post.objects.filter(author=request.user)
+    posts_list = Post.objects.filter(author=request.user)
+    paginator_posts = Paginator(posts_list, 10)  # Show 10 contacts per page.
+    page_number_of_post = request.GET.get("page")
+    posts = paginator_posts.get_page(page_number_of_post)
 
     favorite_posts = CartItem.objects.filter(user=request.user).values_list('post', flat=True)
-    cart_items = Post.objects.filter(id__in=favorite_posts)
+    cart_items_list = Post.objects.filter(id__in=favorite_posts)
+    paginator = Paginator(cart_items_list, 10)
+    page_number_of_cart_items = request.GET.get("page")
+    cart_items = paginator.get_page(page_number_of_cart_items)
+
     post_count = Post.objects.filter(author=request.user).count()
     
     if request.method == 'POST':
@@ -536,9 +554,15 @@ def profile(request):
             p_form.save()
             messages.success(request, 'not loged-in')
             # get all comments on user's posts
-            comments = Comment.objects.filter(product__author=request.user)
-            # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
-            comments_reply_post = Comment.objects.filter(parent__product__author=request.user)
+            comments_list = Comment.objects.filter(product__author=request.user)
+            paginator_comments_list = Paginator(comments_list, 20)
+            page_number_of_comments = request.GET.get("page")
+            comments = paginator_comments_list.get_page(page_number_of_comments)
+
+            comments_reply_post_list = Comment.objects.filter(parent__author=request.user)
+            paginator_comments_reply_post = Paginator(comments_reply_post_list, 20)
+            page_number_of_comments_reply_post = request.GET.get("page")
+            comments_reply_post = paginator_comments_reply_post.get_page(page_number_of_comments_reply_post)
             
             context = {
                 'u_form': u_form,
@@ -546,7 +570,7 @@ def profile(request):
                 'posts': posts,
                 'post_count': post_count,
                 'cart_items': cart_items,
-                'comments': comments,
+                'comments': comments, 
                 'comments_reply_post': comments_reply_post,
             }
             return render(request, 'autho/profile.html', context)
@@ -554,10 +578,18 @@ def profile(request):
         u_form = UserUpdateForm(instance=request.user)
         profile, created = Profile.objects.get_or_create(user=request.user)
         p_form = ProfileUpdateForm(instance=profile)
+        
+    # get all comments on user's posts
+    comments_list = Comment.objects.filter(product__author=request.user)
+    paginator_comments_list = Paginator(comments_list, 20)
+    page_number_of_comments = request.GET.get("page")
+    comments = paginator_comments_list.get_page(page_number_of_comments)
 
-    comments = Comment.objects.filter(product__author=request.user)
-    # comments_reply_post = Comment.objects.filter(Q(product__author=request.user) | Q(parent__product__author=request.user)).select_related('author', 'parent__author')
-    comments_reply_post = Comment.objects.filter(parent__author=request.user)
+    comments_reply_post_list = Comment.objects.filter(parent__author=request.user)
+    paginator_comments_reply_post = Paginator(comments_reply_post_list, 20)
+    page_number_of_comments_reply_post = request.GET.get("page")
+    comments_reply_post = paginator_comments_reply_post.get_page(page_number_of_comments_reply_post)
+
     context = {
         'u_form': u_form,
         'p_form': p_form,
@@ -578,8 +610,21 @@ def favorite_view(request, post_id):
 
 def visible_profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user)
+
+    favorite_posts = CartItem.objects.filter(user=user).values_list('post', flat=True)
+    cart_items_list = Post.objects.filter(id__in=favorite_posts)
+    paginator = Paginator(cart_items_list, 10)
+    page_number_of_cart_items = request.GET.get("page")
+    cart_items = paginator.get_page(page_number_of_cart_items)
+
+    posts_list = Post.objects.filter(author=user)
+    paginator_posts = Paginator(posts_list, 10)
+    page_number_of_posts = request.GET.get("page")
+    posts = paginator_posts.get_page(page_number_of_posts)
+
+
     post_count = Post.objects.filter(author=user).count()
+
     last_login = user.last_login
     current_time = timezone.now()
     if request.user == user:
@@ -590,12 +635,15 @@ def visible_profile(request, username):
         is_active = True
     else:
         is_active = False
+
     context = {
         'user': user,
         'posts': posts,
         'post_count': post_count,
         'is_active': is_active,
         'show_chat_button': show_chat_button,
+        'favorite_posts': favorite_posts,
+        'cart_items': cart_items,
     }
     return render(request, 'autho/visible_profile.html', context)
 
@@ -616,10 +664,18 @@ def inbox(request):
             if message['user'].username == active_direct:
                 message['unread'] = 0
 
+    last_login = user.last_login
+    current_time = timezone.now()
+    if current_time - last_login < timezone.timedelta(minutes=5):
+        is_active = True
+    else:
+        is_active = False
+
     context = {
         'directs': directs,
         'active_direct': active_direct,
         'messages': messages,
+        'is_active': is_active,
     }
     return render(request, 'autho/inbox.html', context)
 
@@ -631,6 +687,13 @@ def directs(request, username):
     active_direct = username
     directs = Message.objects.filter(user=user, reciepient__username=username)
     directs.update(is_read=True)
+
+    last_login = user.last_login
+    current_time = timezone.now()
+    if current_time - last_login < timezone.timedelta(minutes=5):
+        is_active = True
+    else:
+        is_active = False
     
     for message in messages:
         if message['user'].username == username:
@@ -641,6 +704,7 @@ def directs(request, username):
         'directs': directs,
         'active_direct': active_direct,
         'messages': messages,
+        'is_active': is_active,
     }
     return render(request, 'autho/directs.html', context)
 

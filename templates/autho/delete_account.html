@@ -20,6 +20,9 @@
         </p>
         <form method="post">
             {% csrf_token %}
+            <div class="form-group">
+                {{ form.password.label_tag }} {{ form.password }}
+            </div>
             <button type="submit" class="btn btn-danger">Sí, eliminar mi cuenta</button>
         </form>
     </div>

@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.forms.widgets import ClearableFileInput
+from django.forms import PasswordInput
 
 from .models import Account, Category, Post, Profile, Comment
 from ckeditor.fields import RichTextField
@@ -263,3 +264,6 @@ class ReplyForm(forms.ModelForm):
                 'rows': 1,
             }),
         }
+
+class PasswordConfirmationForm(forms.Form):
+    password = forms.CharField(widget=PasswordInput(attrs={'class': 'form-control'}), label='Password')
