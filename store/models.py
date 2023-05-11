@@ -5,6 +5,7 @@ from django.core.validators import FileExtensionValidator
 from PIL import Image
 from django.urls import reverse
 from django.db.models import Max
+from django.db.models import Q
 
 # Create your models here.
 class Account(models.Model):
@@ -174,3 +175,61 @@ class Message(models.Model):
                     'unread': Message.objects.filter(user=user, reciepient__pk=message['reciepient'], is_read=False).count()
                 })
         return users
+    
+    @classmethod
+    def get_unique_conversations(cls):
+        # Get all unique combinations of sender and recipient
+        conversations = cls.objects.values('sender', 'reciepient', 'date').distinct()
+
+        conversation_pairs = set()
+        for conversation in conversations:
+            user1_id = conversation['sender']
+            user2_id = conversation['reciepient']
+            
+            # Skip pairs where the sender and recipient are the same user
+            if user1_id == user2_id:
+                continue
+
+            # Order the user IDs to avoid duplicates with reversed roles
+            if user1_id > user2_id:
+                user1_id, user2_id = user2_id, user1_id
+
+            # If this combination has not been processed yet, add it to the set
+            if (user1_id, user2_id) not in conversation_pairs:
+                conversation_pairs.add((user1_id, user2_id))
+
+        # Convert user IDs to User objects
+        unique_conversations = [
+            (User.objects.get(pk=user1_id), User.objects.get(pk=user2_id))
+            for user1_id, user2_id in conversation_pairs
+        ]
+
+        return unique_conversations
+    
+    @classmethod
+    def get_unique_conversations_by_search(cls, search_term):
+        conversations = cls.objects.filter(
+            Q(sender__username__icontains=search_term) | Q(reciepient__username__icontains=search_term)
+        ).values('sender', 'reciepient', 'date').distinct()
+
+        conversation_pairs = set()
+        for conversation in conversations:
+            user1_id = conversation['sender']
+            user2_id = conversation['reciepient']
+
+            if user1_id == user2_id:
+                continue
+
+            if user1_id > user2_id:
+                user1_id, user2_id = user2_id, user1_id
+
+            if (user1_id, user2_id) not in conversation_pairs:
+                conversation_pairs.add((user1_id, user2_id))
+
+        unique_conversations = [
+            (User.objects.get(pk=user1_id), User.objects.get(pk=user2_id))
+            for user1_id, user2_id in conversation_pairs
+        ]
+
+        return unique_conversations
+

@@ -469,8 +469,11 @@
                                     <i class="bi bi-inbox"></i> Inbox
                                 </a>
                             </div>
+                            {% if user.is_authenticated and user.is_staff %}
+                                <a href="{% url 'admin_only' %}" class="btn btn-primary">Admin Only Page</a>
+                            {% endif %}
+
                             <br>
-                            
                         </div>
                     </div>
                 </div>

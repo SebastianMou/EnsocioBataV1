@@ -74,19 +74,23 @@
                             {% for message in messages %}
                                 <div class="chat-list" data-username="{{ message.user.username }}" data-firstname="{{ message.user.first_name }}">
                                     <a href="{% url 'directs' message.user.username %}" class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <img style="width: 40px; height: 40px;"
-                                                class="img-fluid rounded-circle shadow-4-strong"
-                                                src="{{ message.user.profile.user_image.url }}" alt="user img">
+                                        <div class="d-flex align-items-center flex-grow-1">
+                                            <div class="flex-shrink-0">
+                                                <img style="width: 40px; height: 40px;"
+                                                    class="img-fluid rounded-circle shadow-4-strong"
+                                                    src="{{ message.user.profile.user_image.url }}" alt="user img">
                                                 {% if is_active %}
-                                                <span class=""></span>
+                                                    <span class=""></span>
                                                 {% else %}
-                                                <span class="active"></span>
+                                                    <span class="active"></span>
                                                 {% endif %}
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h3>{{ message.user.first_name }} {{ message.user.last_name }}</h3>
-                                            <p>@{{ message.user }}</p>
+                                            </div>
+                                        
+                                            <div class="ms-3">
+                                                <h3>{{ message.user.first_name }} {{ message.user.last_name }}</h3>
+                                                <p>@{{ message.user }}</p>
+                                            </div>
+                                            
                                         </div>
                                     </a>
                                 </div>
@@ -111,16 +115,21 @@
                                 <img style="width: 45px; height: 45px;" class="img-fluid rounded-circle shadow-4-strong"
                                     src="{{ sending_message_to.profile.user_image.url }}" alt="user img">
                             </div>
-                            <div class="d-flex flex-column">
-                                <a style="text-decoration: none; color: #343434;"
+                            <div class="d-flex flex-column flex-grow-1">
+                                <div class="d-flex align-items-center">
+                                    <a style="text-decoration: none; color: #343434;"
                                     href="{% url 'visible_profile' sending_message_to.username %}">
                                     <h3 style="font-size: 18px; margin: 0;">{{ sending_message_to.first_name }} {{ sending_message_to.last_name }}</h3>
                                     <p style="font-size: 16px; margin: 0;">{{ sending_message_to }}</p>
-                                </a>
+                                    </a>
+                                </div>
                             </div>
+                            <a href="" class="d-flex align-items-center ms-auto" id="delete-conversation" style="margin-left: auto;">
+                                <i class="bi bi-trash3"></i>
+                            </a>
                         </div>
-                        <hr>
                     </div>
+                    <hr>
                     <div style="height: 41rem;" class="modal-body overflow-auto">
                         <div class="msg-body">
                             <ul>
@@ -275,7 +284,7 @@
                         messageList.appendChild(listItem);
                     });
                     const newMessageCount = messageList.children.length;
-                    return oldMessageCount !== newMessageCount;
+                    return oldMessageCount !== 0 && newMessageCount === 0;
                 });
         }
 
@@ -286,13 +295,16 @@
 
         function pollNewMessages() {
             setInterval(() => {
-                getMessages(activeDirect).then(newMessageAdded => {
-                    if (newMessageAdded) {
+                getMessages(activeDirect).then(conversationDeleted => {
+                    if (conversationDeleted) {
+                        console.log('Conversation deleted');
+                    } else {
                         scrollToBottom();
                     }
                 });
             }, 3000);
         }
+
 
         document.querySelector('input[type="file"]').addEventListener('change', function () {
             const fileNameElement = document.getElementById('file-name');
@@ -348,6 +360,41 @@
                 }
             });
         }
+
+        function deleteConversation(username) {
+            fetch(`/delete_conversation_ajax/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log('Conversation deleted successfully');
+
+                        // Clear the messages from the UI
+                        const messageList = document.querySelector('.msg-body ul');
+                        messageList.innerHTML = '';
+
+                        // You can also redirect the user to another page if desired
+                        // window.location.href = '/some-url/';
+                    } else {
+                        console.error('Failed to delete conversation');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+
+        document.addEventListener('click', function (event) {
+            if (event.target.closest('.bi-trash3')) {
+                event.preventDefault();
+                deleteConversation(activeDirect);
+            }
+        });
 
         // #######################################################
 

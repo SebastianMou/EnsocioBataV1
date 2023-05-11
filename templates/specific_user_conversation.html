@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br><br><br>
+<div class="container">
+    
+    <h1>Conversation between {{ user1.username }} and {{ user2.username }}</h1>
+    <ol>
+        {% for message in conversation %}
+            <li>{{ message.sender.username }}: {{ message.body }}</li>
+        {% empty %}
+            <li>No conversation between these users.</li>
+        {% endfor %}
+    </ol>
+</div>
+{% endblock %}

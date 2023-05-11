@@ -18,6 +18,7 @@ urlpatterns = [
     path('directs/<str:username>/', views.directs, name='directs'),
     path('send_message_ajax/', views.send_message_ajax, name='send_message_ajax'),
     path('get_messages_ajax/<str:username>/', views.get_messages_ajax, name='get_messages_ajax'),
+    path('delete_conversation_ajax/<str:username>/', views.delete_conversation, name='delete_conversation'),
     
     # Controlling post
     path('create_post/', views.create_post, name='create_post'),
@@ -52,4 +53,9 @@ urlpatterns = [
     path('password_reset_sent/', auth_views.PasswordResetDoneView.as_view(template_name='authentication/password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="authentication/password_reset_confirm.html"), name='password_reset_confirm'),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name='authentication/password_reset_complete.html'), name='password_reset_complete'),      
+    
+    # Forgoten password
+    path('admin_only/', views.admin_only, name='admin_only'),
+    path('conversation/<str:username1>/<str:username2>/', views.specific_user_conversation, name='specific_user_conversation'),
+    path('admin_only_search_user_convo/', views.admin_only_search_user_convo, name='admin_only_search_user_convo'),
 ]

@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import user_passes_test
 
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -153,7 +154,6 @@ def delete_account(request):
         form = PasswordConfirmationForm()
 
     return render(request, 'autho/delete_account.html', {'form': form})
-
 
 def user_logout(request):
     logout(request)
@@ -741,3 +741,65 @@ def get_messages_ajax(request, username):
 
     # print(messages)  # Add this line to print messages data
     return JsonResponse({'messages': messages})
+
+@login_required
+def delete_conversation(request, username):
+    if request.method == 'POST':
+        user = request.user
+        other_user = get_object_or_404(User, username=username)
+
+        # Delete messages in the conversation
+        Message.objects.filter(
+            (Q(sender=user) & Q(reciepient=other_user) & Q(user=user)) |
+            (Q(sender=other_user) & Q(reciepient=user) & Q(user=user))
+        ).delete()
+
+        Message.objects.filter(
+            (Q(sender=user) & Q(reciepient=other_user) & Q(user=other_user)) |
+            (Q(sender=other_user) & Q(reciepient=user) & Q(user=other_user))
+        ).delete()
+
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'failed'})
+
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
+
+@user_passes_test(is_admin)
+def admin_only(request):
+    unique_conversations = Message.get_unique_conversations()
+    context = {
+        'unique_conversations': unique_conversations,
+    }
+    return render(request, 'admin_only.html', context)
+
+@user_passes_test(is_admin)
+def admin_only_search_user_convo(request):
+    if request.method == 'POST':
+        search_user = request.POST.get('search_user')
+        convos = Message.get_unique_conversations_by_search(search_user)
+
+        context = {
+            'search_user': search_user,
+            'convos': convos,
+        }
+        return render(request, 'service/admin_only_search_user_convo.html', context)
+    else:
+        return render(request, 'service/admin_only_search_user_convo.html')
+
+@user_passes_test(is_admin)
+def specific_user_conversation(request, username1, username2):
+    user1 = User.objects.get(username=username1)
+    user2 = User.objects.get(username=username2)
+
+    conversation = Message.objects.filter(
+        (Q(sender=user1) & Q(reciepient=user2)) | (Q(sender=user2) & Q(reciepient=user1))
+    ).order_by('date')
+
+    context = {
+        'user1': user1,
+        'user2': user2,
+        'conversation': conversation,
+    }
+    return render(request, 'specific_user_conversation.html', context)
